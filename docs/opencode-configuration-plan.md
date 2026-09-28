@@ -1,6 +1,6 @@
 # pstack-lite for OpenCode: scope and implementation plan
 
-Status: implementation in progress. The scope and minimal-change boundary below govern the port.
+Status: implemented. The scope and minimal-change boundary below governed the port. See [verification results](./opencode-verification.md) for completed checks and remaining live-workflow coverage.
 
 ## Goal
 
@@ -30,7 +30,7 @@ Build a lighter pstack focused on implementation, investigation, verification, a
 
 The Grok Bot integration was removed as a separate scope decision. The agreed model set for this port is the OpenAI trio below.
 
-## Agreed removals: next cleanup
+## Implemented removals
 
 Paths are relative to the repository root.
 
@@ -46,9 +46,9 @@ Paths are relative to the repository root.
 | `skills/poteto-mode/playbooks/autopilot-stack.md` | Autonomous stack management. |
 | `skills/poteto-mode/playbooks/autonomous-run.md` | Cursor wakeups and `/loop`-driven execution. |
 
-Remove their router entries, model roles, examples, links, and documentation references in the same cleanup. Remove the `architect runners` setup role. Update the scripts package's test command to remove `orch`; preserve dependencies and bootstrap code still used by `watch-pr`.
+Their router entries, model roles, examples, and active documentation links were removed with them. The `architect runners` setup role is gone. The scripts package tests only `watch-pr`; its dependencies and bootstrap code remain.
 
-Rewrite `docs/guide/07-overnight.md` only if useful retained behavior warrants a page; otherwise delete it and repair guide navigation. Update `docs/guide/04-design.md` around optional implementation comparison and review rather than the removed design lifecycle. Adjust README catalogs and counts to match the retained files.
+The overnight guide was deleted and navigation repaired. `docs/guide/04-design.md` now covers optional comparison and review. The README catalogs 44 skills and 18 playbooks.
 
 ## Retain with narrower behavior
 
@@ -123,21 +123,23 @@ Adapt reviewer diversity and judge selection to prefer a different **model ID**,
 
 These are implementation inputs, not fixed personal preferences. Comment Sicko will report findings; the parent applies accepted edits, consistent with the agent's report-only instruction.
 
-## Recommended configuration boundary
+## Implemented configuration boundary
 
 Use native OpenCode configuration for skill discovery and agent behavior. Use a small, explicit pstack role file for model choices, including ordered panels and judge pools. Native agents alone do not represent variable panel membership or pool selection.
 
-Proposed files, to be implemented after the choices below are settled:
+Files and installation locations:
 
 | File or location | Responsibility |
 | --- | --- |
-| `opencode.jsonc` | Development configuration for this checkout; initially exercised from the repository root. |
+| `.opencode/skills`, `.opencode/agents` | Relative links to canonical root sources for checkout discovery, including nested working directories. |
 | `agents/poteto-agent.md` | Canonical OpenCode-adapted agent prompt and metadata. |
 | `agents/comment-sicko.md` | Canonical OpenCode-adapted reviewer prompt and read-only permissions. |
-| `.opencode/agents/` or `~/.config/opencode/agents/` in the installation target | Discovered agent definitions installed from those canonical sources. Choose the installation mechanism before creating duplicate files. |
-| `.opencode/pstack-models.json` in the target project | Proposed project-specific pstack role choices. This is pstack data, not an OpenCode configuration field. |
-| `~/.config/opencode/pstack-models.json` | Proposed personal defaults, respecting the configured XDG location when applicable. |
+| `scripts/install.mjs` | Links complete skill directories and agent files into project or personal discovery paths; preserves existing installations and rejects conflicts. |
+| `.opencode/agents/` or `~/.config/opencode/agents/` in the installation target | Discovered agent definitions linked from canonical sources. |
+| `.opencode/pstack-models.json` in the target project | Project-specific pstack role choices. This is pstack data, not an OpenCode configuration field. |
+| `~/.config/opencode/pstack-models.json` | Personal defaults, respecting the configured XDG location when applicable. |
 | `skills/setup-pstack/references/model-configuration.md` | Shared contract for role names, resolution, inheritance, budgets, and panel semantics. All consumers refer to it. |
+| `skills/setup-pstack/scripts/models.mjs` | Validates, resolves, and atomically updates versioned role files. |
 
 Prefer project overrides over personal defaults, resolved per role. Replace a panel list as a whole rather than concatenating it. Keep provider credentials in OpenCode's provider configuration, outside pstack's role file.
 
@@ -145,7 +147,7 @@ Keep model selection in one place: role mappings. Leave the two reusable agent d
 
 ## Retained role inventory
 
-These are the upstream role labels to retain after the agreed cleanup. Any new machine-readable names need an explicit mapping and coordinated consumer updates. The source setup skill still includes `architect runners`; remove that role along with the architect skill and its consumers.
+These upstream role labels are retained. The removed `architect runners` role is rejected by the role-file validator.
 
 | Current role label | Shape | Main consumers |
 | --- | --- | --- |
@@ -164,16 +166,16 @@ These are the upstream role labels to retain after the agreed cleanup. Any new m
 | `swarm workers` | Single default; races may specify each arm | `swarm` |
 | `interrogate reviewers` | Ordered list; one reviewer per entry | `interrogate` |
 
-## Decisions to settle before implementation
+## Resolved decisions
 
-1. **Installation scope and mechanism.** Start with this checkout, then define project-local and personal installation. Choose installed copies or links for agents and a skill source that works from nested directories. Verify behavior in a fresh target project.
-2. **Role-file contract.** Finalize the proposed locations, path resolution, version field, role keys, selection representation, per-role override rules, and invalid-file behavior. Keep this separate from undocumented custom keys in `opencode.jsonc`.
-3. **Inheritance and defaults.** Prefer one explicit `inherit-parent` value over two synonymous values. Define missing-role behavior, default panel sizes, and how to report repeated-model panels. Do not silently claim model diversity when all seats inherit one model.
-4. **Reasoning budgets.** Select only variants advertised for each chosen model. Budget labels may be a setup convenience, but cannot assume every provider has an ordered `low/high/max` ladder or rewrite model-name suffixes.
-5. **Agent permissions and depth.** Verify supported delegation depth and adapt only incompatible call paths. Resolve the existing Comment Sicko/`no-comments` edit-ownership ambiguity before translating their permissions and caller contract. Preserve other reviewer roles and account for the fact that children do not inherit read-only restrictions.
-6. **Catalog access.** Select and verify a model-discovery tool or API available in ordinary OpenCode installations. Avoid a dependency on this session's OpenChamber integration. Define a user-supplied catalog fallback when discovery is unavailable.
-7. **Role assignments.** Choose single-role defaults from the agreed OpenAI trio and select reasoning budgets. Use the trio for default panels, with judge selection preferring another model ID where available.
-8. **Activation compatibility.** Verify the closest supported equivalent for existing discovery and cross-turn behavior. Surface any unavoidable behavioral difference before implementing it.
+1. **Installation:** links preserve root sources; project or personal scope is selected at runtime. The source checkout must stay in place.
+2. **Role files:** version 1 JSON, project over personal over bundled defaults, merged per role. Panels replace whole lists. The shared helper owns root/worktree/non-Git lookup and rejects invalid files without overwriting them.
+3. **Inheritance:** retain `inherit-parent` and upstream's `auto` alias. Bundled agents have no model pin. User-pinned agents require explicit handling before claiming parent inheritance.
+4. **Reasoning:** leave defaults unpinned. Setup asks for supported variants from the live catalog and preserves choices on rerun.
+5. **Permissions and depth:** Comment Sicko reports; the parent edits. Leaf agents work directly at a nesting limit and return evidence so the parent can launch the next review stage.
+6. **Catalog:** use OpenCode's model-discovery tool, with CLI/model-selector and user-confirmed availability fallbacks. No OpenChamber dependency.
+7. **Roles:** recommend Astra for hardest work and judgment, Sol for implementation, Luna for exploration and narrow work. Setup can override every role. Default panels use the trio; Reflect retains its shared role.
+8. **Activation:** explicit-only metadata is `opencode/autoinvoke: false`. Mode persistence is a conversation instruction; reload after a fresh session or lost context.
 
 ## Implementation sequence
 
