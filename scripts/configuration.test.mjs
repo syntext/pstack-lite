@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, realpathSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { test } from 'node:test';
@@ -95,6 +95,42 @@ test('installation is repeatable, preserves unrelated files and supports linked 
   assert.equal(result, 'openai/gpt-6-luna');
   assert.equal(realpathSync(join(destination, 'agents/comment-sicko.md')), fileURLToPath(new URL('../agents/comment-sicko.md', import.meta.url)));
   assert.ok(existsSync(join(destination, 'skills/poteto-mode/scripts/watch-pr/watch-pr')));
+});
+
+test('global installation configures a nested project without installing locally or changing personal defaults', t => {
+  const { root, project, config } = fixture(t);
+  const global = join(config, 'opencode');
+  const env = { ...process.env, XDG_CONFIG_HOME: config };
+  execFileSync(process.execPath, [fileURLToPath(new URL('./install.mjs', import.meta.url)), '--global'], { env });
+  const script = join(global, 'skills/setup-pstack/scripts/models.mjs');
+  const paths = locations(project, config);
+  updateModels(paths.global, { version: 1, roles: { 'how explorer': 'openai/gpt-6-luna#low' } });
+  const personalBefore = readFileSync(paths.global, 'utf8');
+  const globalBefore = readdirSync(global, { recursive: true }).sort();
+  const nested = join(project, 'src', 'nested');
+  mkdirSync(nested, { recursive: true });
+  const input = join(root, 'confirmed.json');
+  writeFileSync(input, JSON.stringify({ version: 1, roles: { 'how explorer': 'openai/gpt-6-sol#high' } }));
+  const run = args => execFileSync(process.execPath, [script, ...args], { cwd: nested, env, encoding: 'utf8' });
+
+  assert.equal(run(['write', '--scope', 'project', '--input', input]).trim(), paths.project);
+  const beforeRerun = readFileSync(paths.project, 'utf8');
+  run(['write', '--scope', 'project', '--input', input]);
+  assert.equal(readFileSync(paths.project, 'utf8'), beforeRerun);
+  assert.deepEqual(readdirSync(join(project, '.opencode')), ['pstack-models.json']);
+  const effective = JSON.parse(run(['read']));
+  assert.equal(effective.paths.project, paths.project);
+  assert.equal(effective.roles['how explorer'], 'openai/gpt-6-sol#high');
+  assert.equal(effective.roles['bug-fix'], 'openai/gpt-6-sol');
+  assert.equal(readFileSync(paths.global, 'utf8'), personalBefore);
+  assert.deepEqual(readdirSync(global, { recursive: true }).sort(), globalBefore);
+
+  const otherProject = join(root, 'other-project');
+  mkdirSync(otherProject);
+  execFileSync('git', ['init', '-q', otherProject]);
+  const other = JSON.parse(run(['read', '--directory', otherProject]));
+  assert.equal(other.roles['how explorer'], 'openai/gpt-6-luna#low');
+  assert.equal(existsSync(join(otherProject, '.opencode')), false);
 });
 
 test('installation conflicts are detected before creating any links', t => {

@@ -117,7 +117,7 @@ The live OpenCode model catalog confirmed these exact references on 2026-09-28:
 
 Use the complete `provider/model` reference in model-role data and native agent configuration. A bare `gpt-6-astra` or a Cursor-style `gpt-6-astra-max` is not the reference format for this port. A selected reasoning variant is appended with `#`, for example `openai/gpt-6-astra#high`. That example illustrates syntax; no reasoning budget has been selected yet. Recheck model and variant availability in the installation target during setup.
 
-Use one entry for each of the three models in default Arena and Interrogate panels. Preserve Reflect's existing shared-role structure. Per the user's ranking, recommend Astra for the hardest work, judgment and synthesis; Sol for routine implementation; Luna for exploration and small, specific tasks. Setup offers these recommendations and lets users choose role assignments, reasoning variants, and installation scope at runtime. Defaults do not pin reasoning variants. Keep explicit parent inheritance available as described below. Fast model variants with separate `-fast` IDs are outside the selected set.
+Use one entry for each of the three models in default Arena and Interrogate panels. Preserve Reflect's existing shared-role structure. Per the user's ranking, recommend Astra for the hardest work, judgment and synthesis; Sol for routine implementation; Luna for exploration and small, specific tasks. Setup offers these recommendations and lets users choose role assignments, reasoning variants, and configuration scope at runtime. Installation is a separate explicit action. Defaults do not pin reasoning variants. Keep explicit parent inheritance available as described below. Fast model variants with separate `-fast` IDs are outside the selected set.
 
 Adapt reviewer diversity and judge selection to prefer a different **model ID**, rather than requiring a different provider or model family. All three chosen models share the OpenAI provider and GPT-6 family. Update upstream family-prefix fallback rules accordingly; an unavailable selection must lead to an explicit recovery choice, not a silent switch to Claude, Grok, or a guessed model.
 
@@ -168,7 +168,7 @@ These upstream role labels are retained. The removed `architect runners` role is
 
 ## Resolved decisions
 
-1. **Installation:** links preserve root sources; project or personal scope is selected at runtime. The source checkout must stay in place.
+1. **Installation:** links preserve root sources; install globally once for use across projects, or explicitly request a project installation. Model setup reuses the available installation and writes only the selected project or personal role file. The source checkout must stay in place.
 2. **Role files:** version 1 JSON, project over personal over bundled defaults, merged per role. Panels replace whole lists. The shared helper owns root/worktree/non-Git lookup and rejects invalid files without overwriting them.
 3. **Inheritance:** retain `inherit-parent` and upstream's `auto` alias. Bundled agents have no model pin. User-pinned agents require explicit handling before claiming parent inheritance.
 4. **Reasoning:** leave defaults unpinned. Setup asks for supported variants from the live catalog and preserves choices on rerun.

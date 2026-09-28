@@ -10,6 +10,8 @@ node <setup-pstack-base>/scripts/models.mjs read --directory <target-directory>
 
 ## Sources and precedence
 
+Installation and configuration are independent. Globally installed skills and agents read the target project's preferences through this resolver. Project model setup creates only `.opencode/pstack-models.json`; local skill and agent links are needed only for an explicitly requested project installation. A project using personal or bundled defaults needs no pstack configuration file.
+
 1. Bundled `default-models.json` supplies recommendations.
 2. `${XDG_CONFIG_HOME:-~/.config}/opencode/pstack-models.json` overrides individual roles for the user.
 3. `<project-root>/.opencode/pstack-models.json` overrides individual roles for the project. Lists replace whole lists.

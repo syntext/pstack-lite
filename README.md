@@ -53,13 +53,15 @@ the original files remain available in the preserved upstream history and baseli
 requires OpenCode V2, Node.js 22 or newer, and Git. from this checkout:
 
 ```sh
-# Install in another project (or use . for this checkout).
-node scripts/install.mjs --project /absolute/path/to/project
-# Or install personally, after choosing that scope:
+# Install once for use across your projects.
 node scripts/install.mjs --global
+# Only when you explicitly want a project-local installation:
+node scripts/install.mjs --project /absolute/path/to/project
 ```
 
 the installer links complete skill directories and both agents into OpenCode's native discovery paths. keep this checkout in place. rerunning is safe; same-name files from another installation produce a conflict rather than being overwritten. project sources work from nested directories too. start a fresh session after installation. this checkout includes its own relative discovery links.
+
+with a global installation, `/setup-pstack` creates only `.opencode/pstack-models.json` when you choose project preferences. it reuses the global skills and agents without adding local links. a project using personal or bundled defaults needs no pstack files. setup changes model preferences; installing the bundle is a separate, explicit action.
 
 PR tools additionally use authenticated `gh` and Bun. the watcher installs its locked dependencies beside its scripts on first use, so that directory must be writable. app verification uses whatever browser, terminal, simulator, or project harness is available; unavailable verification is reported as a gap.
 
@@ -151,7 +153,7 @@ the full rules and playbooks live in [`skills/poteto-mode/SKILL.md`](./skills/po
 | [`/swarm`](./skills/swarm/SKILL.md) | you want N parallel workers across different slices or races, then one aggregated report. |
 | [`/interrogate`](./skills/interrogate/SKILL.md) | you have a diff and want several different models to try to break it, including a strict code-quality lens. |
 | [`/automate-me`](./skills/automate-me/SKILL.md) | you want your own `-mode` skill, drafted from how you've actually worked. |
-| [`/setup-pstack`](./skills/setup-pstack/SKILL.md) | you want to choose installation scope, models per role, and reasoning variants. detects your models and writes role overrides. |
+| [`/setup-pstack`](./skills/setup-pstack/SKILL.md) | you want to choose project or personal model preferences and reasoning variants. detects your models and writes role overrides. |
 | [`/reflect`](./skills/reflect/SKILL.md) | a long task landed and you want the recipe captured as a skill edit. |
 | [`/teach`](./skills/teach/SKILL.md) | you want to actually understand a change or subsystem, not just have it summarized. runs how + why and weaves one plain explanation, built up diagram by diagram. |
 | [`/tdd`](./skills/tdd/SKILL.md) | you're fixing a bug and there's a cheap local test path. write the failing test first, then the fix. |
