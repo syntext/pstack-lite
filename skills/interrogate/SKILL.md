@@ -1,7 +1,8 @@
 ---
 name: interrogate
 description: "Use for \"interrogate\", \"adversarial review\", \"multi-model review\", \"challenge this\", \"stress test this code\", \"find blind spots\", or \"tear this apart\". Multiple LLM reviewers challenge changes from independent angles."
-disable-model-invocation: true
+metadata:
+  opencode/autoinvoke: false
 ---
 
 # Interrogate
@@ -9,6 +10,8 @@ disable-model-invocation: true
 Spawn one reviewer per configured model to adversarially review code changes. Each model gets the same prompt and rubric. The adversarial signal comes from model diversity, not assigned personas.
 
 The deliverable is a synthesized verdict. Do NOT auto-apply changes.
+
+Before delegating, read `../setup-pstack/references/model-configuration.md` and resolve roles for the target project. Inheritance, unavailable selections, and nesting limits follow that contract.
 
 ## Step 1, Determine Scope
 
@@ -33,20 +36,19 @@ Write one clear paragraph. If you're unsure about the intent, ask the user befor
 
 ## Step 3, Spawn Reviewers
 
-Launch all reviewers in a single message using the Task tool. Use the `interrogate reviewers` line in `~/.cursor/rules/pstack-models.mdc`, one reviewer per entry, extending or shrinking the Reviewer A/B/C labels below to the configured entry count. If the rule or that line is missing, use the table defaults.
+Launch all reviewers in a single message using the `subagent` tool. Use the `interrogate reviewers` role, one reviewer per entry, extending or shrinking the Reviewer A/B/C labels below to the configured entry count. If the role is not overridden, use the table defaults.
 
 | Subagent | Default model |
 |----------|---------------|
-| Reviewer A | `claude-opus-5-5-max` |
-| Reviewer B | `gpt-5.6-sol-max` |
-| Reviewer C | `grok-4.7-xhigh-fast` |
+| Reviewer A | `openai/gpt-6-astra` |
+| Reviewer B | `openai/gpt-6-sol` |
+| Reviewer C | `openai/gpt-6-luna` |
 
 For each reviewer:
-- `subagent_type`: `generalPurpose`
-- `model`: the configured `interrogate reviewers` entry, or the table default with no configured line. For an `auto` or `inherit-parent` entry, omit `model` so that reviewer runs on the parent model.
-- `readonly`: `true`
+- `agent`: `explore`
+- `model`: the configured `interrogate reviewers` entry, using the shared contract for inheritance.
 
-If the Task tool rejects a configured entry, run that reviewer on the table default of its family and say so. Families go by prefix: `claude-*`, `gpt-*`, and `grok-*`. With no family match, use Reviewer A's default. If it rejects a table default, check the valid slugs in the Task tool's error message, pick the closest equivalent (prefer the highest-reasoning tier of the same family), spawn with it, and open a separate PR to update the default table. Do not block the review on the slug issue. Never treat an alias entry as a rejected slug or apply either fallback to it.
+If a selection is unavailable, report it and obtain an available selection or parent inheritance. Do not silently substitute another model.
 
 Read `references/reviewer-prompt.md` and fill in the template with:
 1. The stated intent
