@@ -1,4 +1,12 @@
-# pstack
+# pstack for OpenCode
+
+an in-progress OpenCode adaptation of [pstack](https://github.com/cursor/plugins/tree/main/pstack), created by [Lauren Tan (poteto)](https://x.com/poteto) in the [cursor/plugins repository](https://github.com/cursor/plugins). this repository preserves pstack's relevant git history and [MIT license](./LICENSE).
+
+the scope is skills, engineering principles, and model selection. the upstream files have been imported; OpenCode installation, agent configuration, and workflow adaptation are still pending. the skill and playbook descriptions below describe the imported workflows, not verified OpenCode support.
+
+much of this README retains Lauren's original wording. first-person descriptions of pstack's style and philosophy are hers.
+
+## from the original author
 
 i'm [poteto](https://x.com/poteto). i'm not a president or ceo, but i've worked with millions of lines of code at Meta, Netflix, and Cursor. i'm also on the react core team where i help build and maintain react compiler.
 
@@ -8,26 +16,48 @@ there's a growing sense that ai writes too much slop code. i agree. i don't want
 
 **pstack gives you fearless parallelism.** when you can go deep on one agent and trust it to write good, verifiable code, you can truly parallelize with confidence. start multiple agents up with `poteto-mode` and trust that they'll apply rigorous engineering principles to their work.
 
-**cursor gives you the best of all worlds.** every frontier model has its strengths and weaknesses. use any model with pstack. in fact, many of my skills use multi-model workflows to take advantage of each model's unique strengths.
+every frontier model has its strengths and weaknesses. many of these skills use multi-model workflows to take advantage of each model's unique strengths.
 
 fork it. improve it. make it yours. PRs are welcome! 
 
-## install
+## changes from upstream
 
-```bash
-/add-plugin pstack
-```
+### removed from this README and excluded from the port
+
+- **Cursor plugin packaging** (`.cursor-plugin/`): the Cursor installation command has been removed.
+- **Benny** (`automations/benny/`): the optional Slack triage and reproduction automations are outside this port's scope. their setup instructions have been removed.
+- **Grok Bot UI** (`skills/make-bot-ui/`): the routine/webhook integration is outside this port's scope. its skill listing has been removed. this exclusion concerns the bot integration, not Grok as a selectable model.
+- **Cursor-only setup advice**: installation of `cursor-team-kit`, `/loop` recommendations, and migration advice for old Cursor model rules have been removed.
+
+the excluded source directories are still present in the baseline import; deleting them is the next cleanup step.
+
+### replaced in this README
+
+- Cursor installation instructions and fixed model defaults now give way to the port's current status and intended setup flow.
+- Cursor-specific subagent invocation syntax has been replaced with descriptions of the two agents.
+- companion-tool installation advice has been replaced with an explicit list of dependencies that need adaptation.
+
+the underlying skills still need replacements for Cursor's `Task` calls, `.cursor` paths, model-rule format, transcript discovery, and cloud-agent assumptions. those runtime changes have not been implemented.
+
+### added for this port
+
+- a standalone repository with pstack's contents at the root and its relevant upstream history preserved.
+- explicit upstream attribution, scope, and implementation status in this README.
+
+## installation status
+
+OpenCode installation instructions will be added after skill discovery, agent definitions, and model configuration have been adapted and verified.
 
 ## get started
 
-two steps:
+the intended entry points remain the same once the OpenCode adaptation is ready:
 
 1. run [`/setup-pstack`](./skills/setup-pstack/SKILL.md), pick a reasoning budget, and choose which models you want.
 2. use [`/poteto-mode`](./skills/poteto-mode/SKILL.md) whenever you're doing anything that requires rigor.
 
-new here? the [pstack guide](./docs/guide/README.md) walks you through a first real task, from setup and prompting through verification and overnight runs.
+the imported [pstack guide](./docs/guide/README.md) walks through setup, prompting, and verification. it still contains Cursor-specific instructions and needs adaptation.
 
-that's it. the other skills are situational; the mode skill uses them for you as needed. out of the box the mode splits work by model strength: code delegates (feature, refactoring, bug fix, perf, hillclimb) go to grok, while the hardest changes, prose, and judgment go to opus 5.5. the default panel is opus 5.5 / sol / grok. [`/setup-pstack`](./skills/setup-pstack/SKILL.md) changes any of it.
+the other skills are situational; the mode skill uses them for you as needed. the mode splits work by model strength across code, prose, judgment, and review panels. adapting [`/setup-pstack`](./skills/setup-pstack/SKILL.md) to configure those roles from available OpenCode models is part of the port.
 
 ## usage
 
@@ -40,11 +70,6 @@ this skill is the main shortcut. i use it whenever i need the agent to do rigoro
 ```
 /poteto-mode this pr has a subtle bug where the scroll drifts every 750ms even when idle. repro
 first, then fix and verify.
-```
-
-```
-/poteto-mode i'm going to bed. land the stack even if ci flakes. i want everything merged by
-morning.
 ```
 
 <details>
@@ -90,8 +115,6 @@ the full rules and playbooks live in [`skills/poteto-mode/SKILL.md`](./skills/po
 
 [`/poteto-mode`](./skills/poteto-mode/SKILL.md) is also a sticky mode: once entered it stays on across turns, applying itself when a playbook matches or the task needs rigor and staying out of the way otherwise. opt out any time by saying so.
 
-[`/poteto-mode`](./skills/poteto-mode/SKILL.md) works extremely well with cursor's `/loop` command. you can make cursor work for many hours without sacrificing rigor.
-
 ## skills
 
 [`/poteto-mode`](./skills/poteto-mode/SKILL.md) runs most of these for you when a step needs them (`how`, `why`, `architect`, `arena`, `swarm`, `interrogate`, `unslop`, `no-comments`, `technical-writing`, `tdd`, and the principles). the table below is for when you want one directly:
@@ -119,7 +142,6 @@ the full rules and playbooks live in [`skills/poteto-mode/SKILL.md`](./skills/po
 | [`/swarm`](./skills/swarm/SKILL.md) | you want N parallel workers across different slices or races, then one aggregated report. |
 | [`/interrogate`](./skills/interrogate/SKILL.md) | you have a diff and want several different models to try to break it, including a strict code-quality lens. |
 | [`/automate-me`](./skills/automate-me/SKILL.md) | you want your own `-mode` skill, drafted from how you've actually worked. |
-| [`/make-bot-ui`](./skills/make-bot-ui/SKILL.md) | you want a page or dashboard whose buttons wake a Grok Bot over a webhook, including the sender-key handoff and Tailscale. |
 | [`/setup-pstack`](./skills/setup-pstack/SKILL.md) | you want to pick which models pstack uses per role. detects your models and writes a config rule. |
 | [`/reflect`](./skills/reflect/SKILL.md) | a long task landed and you want the recipe captured as a skill edit. |
 | [`/teach`](./skills/teach/SKILL.md) | you want to actually understand a change or subsystem, not just have it summarized. runs how + why and weaves one plain explanation, built up diagram by diagram. |
@@ -156,8 +178,6 @@ prototype:         /poteto-mode build two prototypes of the markdown renderer so
                    spawn an agent for each.
 multi-phase:       /poteto-mode open source these skills as a plugin. nothing internal leaks, work
                    in a temp dir, show me the dependency graph first.
-overnight run:     /poteto-mode i'm going to bed. land the stack even if ci flakes. i want
-                   everything merged by morning.
 babysit:           /poteto-mode check on pr 123. anything outstanding?
 visual parity:     /poteto-mode the row spacing is too tall when this flag is on. the second image
                    is correct. repro and fix until it matches.
@@ -185,11 +205,11 @@ automate-me:       /automate-me
 
 ## the `poteto-agent` and Comment Sicko subagents
 
-pstack also ships a subagent that runs my style end to end. spawn it from a parent agent via [`subagent_type: "poteto-agent"`](./agents/poteto-agent.md). it reads `poteto-mode` in full, including its inline principles index, before doing any work. substituting `generalPurpose` skips that read and drifts.
+pstack also ships [poteto-agent](./agents/poteto-agent.md), a subagent that runs Lauren's style end to end. it reads `poteto-mode` in full, including its inline principles index, before doing any work.
 
-[`/poteto-mode`](./skills/poteto-mode/SKILL.md) and [`subagent_type: "poteto-agent"`](./agents/poteto-agent.md) route through the same wrapper.
+[`/poteto-mode`](./skills/poteto-mode/SKILL.md) and [poteto-agent](./agents/poteto-agent.md) route through the same wrapper.
 
-pstack also ships [Comment Sicko](./agents/comment-sicko.md), a read-only comment reviewer available as `subagent_type: "Comment Sicko"`. usually invoke it through [`/no-comments`](./skills/no-comments/SKILL.md), not directly.
+pstack also ships [Comment Sicko](./agents/comment-sicko.md), a read-only comment reviewer. usually invoke it through [`/no-comments`](./skills/no-comments/SKILL.md), not directly. both agent definitions still need OpenCode configuration.
 
 ## principles
 
@@ -226,19 +246,19 @@ twenty-three short skills, one principle each. `poteto-mode` indexes them inline
 
 </details>
 
-## not shipped here
+## dependencies to adapt
 
-a few things `poteto-mode` references but doesn't bundle:
+the imported workflows reference tools that pstack does not bundle:
 
 - `/deslop` and the `deslop` skill ship in the `cursor-team-kit` plugin.
 - `control-cli` (for CLIs and TUIs) and `control-ui` (for browser, Electron, web) ship in `cursor-team-kit` too.
-- `/create-skill` is a cursor built-in. cursor also ships a built-in `/babysit`; inside `poteto-mode`, the [babysit playbook](./skills/poteto-mode/playbooks/babysit.md) supersedes it for pr-status requests.
+- `/create-skill` is a Cursor built-in.
 
-install `cursor-team-kit` alongside pstack if you want the full set.
+the OpenCode adaptation needs supported equivalents for these capabilities. the [babysit playbook](./skills/poteto-mode/playbooks/babysit.md) and its GitHub tooling remain useful source material for PR-status workflows.
 
 ## why are there no planning skills?
 
-cursor already has a great plan mode which works great with pstack. but personally, i don't believe in planning. the best spec is code. if you do want to make a plan, [`/poteto-mode`](./skills/poteto-mode/SKILL.md) covers it, but it's not a default. 
+the best spec is code. if you do want to make a plan, [`/poteto-mode`](./skills/poteto-mode/SKILL.md) covers it, but it's not a default.
 
 ## make it yours
 
@@ -246,16 +266,8 @@ cursor already has a great plan mode which works great with pstack. but personal
 
 type [`/automate-me`](./skills/automate-me/SKILL.md). it mines your recent transcripts, drafts a `<your-name>-mode` skill from how you've actually worked, and routes through pstack underneath. you keep pstack as the base and end up with your own routing skill alongside `poteto-mode`.
 
-models are configurable too. type [`/setup-pstack`](./skills/setup-pstack/SKILL.md). it detects the models you have access to and writes a small always-applied rule mapping each role (code, judgment, the review panels) to a model. every skill reads it and falls back to sensible defaults when the rule is absent, so you override only what you want.
-
-a rule written before 0.15.3 pins the old default models. delete those role lines, or delete the file, then run `/setup-pstack` again. a rerun keeps any role whose model differs from the default.
-
-## automations
-
-pstack also ships a dormant [benny automation pack](./automations/benny/). benny triages slack issue reports, then reproduces and fixes confirmed bugs with real ui evidence. its files are not registered as slash skills.
-
-to set it up, point cursor at [`FOR_AGENTS.md`](./automations/benny/FOR_AGENTS.md). setup copies the pack into the target repository at `.cursor/automations/benny/`, enables pstack there for shared skills, and keeps user configuration outside the copied pack.
+models are configurable too. [`/setup-pstack`](./skills/setup-pstack/SKILL.md) is the entry point for mapping each role (code, judgment, the review panels) to a model. its OpenCode configuration format is still to be implemented.
 
 ## license
 
-MIT
+[MIT](./LICENSE). original work copyright Lauren Tan. upstream: [cursor/plugins — pstack](https://github.com/cursor/plugins/tree/main/pstack).
