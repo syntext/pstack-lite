@@ -43,6 +43,7 @@ the underlying skills still need replacements for Cursor's `Task` calls, `.curso
 
 - a standalone repository with pstack's contents at the root and its relevant upstream history preserved.
 - explicit upstream attribution, scope, and implementation status in this README.
+- a [configuration design note](./docs/opencode-configuration-plan.md) with verified OpenCode V2 behavior, the current role inventory, and decisions for the next implementation step.
 
 ## installation status
 
