@@ -22,14 +22,14 @@ fork it. improve it. make it yours. PRs are welcome!
 
 ## changes from upstream
 
-### removed from this README and excluded from the port
+### removed from the port
 
-- **Cursor plugin packaging** (`.cursor-plugin/`): the Cursor installation command has been removed.
-- **Benny** (`automations/benny/`): the optional Slack triage and reproduction automations are outside this port's scope. their setup instructions have been removed.
-- **Grok Bot UI** (`skills/make-bot-ui/`): the routine/webhook integration is outside this port's scope. its skill listing has been removed. this exclusion concerns the bot integration, not Grok as a selectable model.
+- **Cursor plugin packaging** (`.cursor-plugin/`): removed the manifest and Cursor installation command.
+- **Benny** (`automations/benny/`): removed the optional Slack triage and reproduction automation pack, including its skills, templates, and setup instructions.
+- **Grok Bot UI** (`skills/make-bot-ui/`): removed the routine/webhook integration and its skill listing. this exclusion concerns the bot integration, not Grok as a selectable model.
 - **Cursor-only setup advice**: installation of `cursor-team-kit`, `/loop` recommendations, and migration advice for old Cursor model rules have been removed.
 
-the excluded source directories are still present in the baseline import; deleting them is the next cleanup step.
+the original files remain available in the preserved upstream history and baseline commit `8503161`.
 
 ### replaced in this README
 

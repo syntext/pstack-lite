@@ -1,16 +1,10 @@
 # Set up pstack
 
-In this page you install the plugin, pick which models pstack uses, and run your first task. Setup is one command plus a short conversation.
+This guide is imported from upstream. Model setup and workflow instructions below still describe the Cursor implementation and await OpenCode adaptation.
 
-## Install the plugin
+## Installation status
 
-In a Cursor chat, run:
-
-```text
-/add-plugin pstack
-```
-
-Cursor confirms the plugin is installed.
+Cursor plugin packaging has been removed from this port. OpenCode installation instructions will follow once skill discovery, agent definitions, and model configuration are verified. See the [port status](../../README.md#installation-status).
 
 ## Pick your models
 
