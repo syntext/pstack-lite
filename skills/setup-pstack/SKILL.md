@@ -13,7 +13,7 @@ Configure model roles for the installed skills at runtime. Read `references/mode
 
 Ask with the `question` tool whether to configure this project or the user's personal defaults. This selects only the model-role file to write. Resolve the target project directory before reading or writing configuration. Do not change the user's global OpenCode configuration just because this skill is installed globally.
 
-Check the target project's available skills and agents, including `poteto-agent` and `comment-sicko`. A global installation satisfies availability; missing project-local `skills/` or `agents/` directories do not mean pstack is missing. If components are unavailable, report which ones and offer to install them globally. Preferences can still be saved, but report the missing components before claiming the workflows are ready. Run the installer only on an explicit installation request; project configuration alone never requests a project installation.
+Check the target project's available skills and agents, including `poteto-agent` and `comment-sicko`. The native plugin with ID `pstack` registers these directly; a global plugin installation satisfies availability. Missing project-local `skills/` or `agents/` directories do not mean pstack is missing. If components are unavailable, inspect the plugin's status and report which ones are missing. Preferences can still be saved, but report the missing components before claiming the workflows are ready. Enable or install the plugin only on an explicit installation request; project configuration alone never requests a project installation.
 
 Discover the target project's models with OpenCode's model-discovery tool when available (in Code Mode, discover the `opencode` models tool). Otherwise use `opencode models` from that directory and the `/models` selector. Confirm supported reasoning variants from the live catalog; if the available interface does not expose them, ask the user for the available selections. Never write an unconfirmed model/variant. `inherit-parent` and `auto` are always valid choices.
 
@@ -37,7 +37,7 @@ Confirm every explicit model and variant is available in the target project. Mar
 
 ### 5. Write model preferences
 
-Project setup writes only `<target-project-root>/.opencode/pstack-models.json`; personal setup writes only the personal role file. Reuse the existing installation. Do not create skill or agent links, copy the bundle, edit OpenCode discovery configuration, or remove existing installations as part of model setup. A separately requested installation uses `scripts/install.mjs` from the resolved source checkout, with `--global` or an explicitly requested `--project` target.
+Project setup writes only `<target-project-root>/.opencode/pstack-models.json`; personal setup writes only the personal role file. Reuse the existing plugin installation. Do not create skill or agent links, copy the bundle, edit OpenCode discovery configuration, or remove existing installations as part of model setup. A separately requested installation enables this package in the global or project OpenCode `plugins` array. Follow the installation section in the package's `README.md` (`../../README.md` relative to this skill).
 
 Write the confirmed overrides to a temporary JSON file with `version: 1` and `roles`. Include only the roles intended for this scope; do not copy project overrides into personal defaults. Then run:
 

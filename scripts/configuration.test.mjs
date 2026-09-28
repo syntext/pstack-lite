@@ -1,11 +1,10 @@
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
-import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, realpathSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { test } from 'node:test';
 import { fileURLToPath } from 'node:url';
-import { install } from './install.mjs';
 import { locations, resolveModels, updateModels } from '../skills/setup-pstack/scripts/models.mjs';
 
 function fixture(t) {
@@ -80,29 +79,11 @@ test('non-Git projects resolve the nearest .opencode and worktrees use their own
   assert.equal(locations(worktree, config).project, join(worktree, '.opencode/pstack-models.json'));
 });
 
-test('installation is repeatable, preserves unrelated files and supports linked CLI execution', t => {
-  const { project, config } = fixture(t);
-  const destination = join(project, '.opencode');
-  mkdirSync(destination);
-  writeFileSync(join(destination, 'opencode.json'), '{"model":"user/model"}\n');
-  assert.ok(install(destination).length > 2);
-  assert.deepEqual(install(destination), []);
-  assert.equal(readFileSync(join(destination, 'opencode.json'), 'utf8'), '{"model":"user/model"}\n');
-  const script = join(destination, 'skills/setup-pstack/scripts/models.mjs');
-  const result = JSON.parse(execFileSync(process.execPath, [script, 'read', '--directory', project, '--role', 'how explorer'], {
-    encoding: 'utf8', env: { ...process.env, XDG_CONFIG_HOME: config },
-  }));
-  assert.equal(result, 'openai/gpt-6-luna');
-  assert.equal(realpathSync(join(destination, 'agents/comment-sicko.md')), fileURLToPath(new URL('../agents/comment-sicko.md', import.meta.url)));
-  assert.ok(existsSync(join(destination, 'skills/poteto-mode/scripts/watch-pr/watch-pr')));
-});
-
-test('global installation configures a nested project without installing locally or changing personal defaults', t => {
+test('package helper configures a nested project without installing locally or changing personal defaults', t => {
   const { root, project, config } = fixture(t);
   const global = join(config, 'opencode');
   const env = { ...process.env, XDG_CONFIG_HOME: config };
-  execFileSync(process.execPath, [fileURLToPath(new URL('./install.mjs', import.meta.url)), '--global'], { env });
-  const script = join(global, 'skills/setup-pstack/scripts/models.mjs');
+  const script = fileURLToPath(new URL('../skills/setup-pstack/scripts/models.mjs', import.meta.url));
   const paths = locations(project, config);
   updateModels(paths.global, { version: 1, roles: { 'how explorer': 'openai/gpt-6-luna#low' } });
   const personalBefore = readFileSync(paths.global, 'utf8');
@@ -131,34 +112,4 @@ test('global installation configures a nested project without installing locally
   const other = JSON.parse(run(['read', '--directory', otherProject]));
   assert.equal(other.roles['how explorer'], 'openai/gpt-6-luna#low');
   assert.equal(existsSync(join(otherProject, '.opencode')), false);
-});
-
-test('installation conflicts are detected before creating any links', t => {
-  const { project } = fixture(t);
-  const destination = join(project, '.opencode');
-  mkdirSync(join(destination, 'agents'), { recursive: true });
-  const path = join(destination, 'agents/poteto-agent.md');
-  writeFileSync(path, 'user-owned agent');
-  assert.throws(() => install(destination), /Installation conflict/);
-  assert.equal(readFileSync(path, 'utf8'), 'user-owned agent');
-  assert.equal(existsSync(join(destination, 'skills')), false);
-});
-
-test('checkout-wide discovery links are recognized as an existing installation', t => {
-  const { project } = fixture(t);
-  const destination = join(project, '.opencode');
-  mkdirSync(destination);
-  for (const kind of ['skills', 'agents']) {
-    symlinkSync(fileURLToPath(new URL(`../${kind}`, import.meta.url)), join(destination, kind), 'dir');
-  }
-  assert.deepEqual(install(destination), []);
-});
-
-test('dangling same-name links are conflicts before any installation writes', t => {
-  const { project } = fixture(t);
-  const destination = join(project, '.opencode');
-  mkdirSync(join(destination, 'agents'), { recursive: true });
-  symlinkSync('/missing/pstack-agent.md', join(destination, 'agents/poteto-agent.md'));
-  assert.throws(() => install(destination), /Installation conflict/);
-  assert.equal(existsSync(join(destination, 'skills')), false);
 });

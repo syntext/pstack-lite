@@ -125,21 +125,23 @@ These are implementation inputs, not fixed personal preferences. Comment Sicko w
 
 ## Implemented configuration boundary
 
-Use native OpenCode configuration for skill discovery and agent behavior. Use a small, explicit pstack role file for model choices, including ordered panels and judge pools. Native agents alone do not represent variable panel membership or pool selection.
+Load the native `pstack` plugin through OpenCode's `plugins` configuration. It registers the canonical skills and agents in memory. Use a small, explicit pstack role file for model choices, including ordered panels and judge pools. Native agents alone do not represent variable panel membership or pool selection.
 
 Files and installation locations:
 
 | File or location | Responsibility |
 | --- | --- |
-| `.opencode/skills`, `.opencode/agents` | Relative links to canonical root sources for checkout discovery, including nested working directories. |
+| `package.json`, `index.js`, `plugin/` | Distributable V2 plugin and registration of the canonical Markdown sources. |
+| `.opencode/opencode.json` | Enables the native plugin in this checkout through a config-relative path. |
 | `agents/poteto-agent.md` | Canonical OpenCode-adapted agent prompt and metadata. |
 | `agents/comment-sicko.md` | Canonical OpenCode-adapted reviewer prompt and read-only permissions. |
-| `scripts/install.mjs` | Links complete skill directories and agent files into project or personal discovery paths; preserves existing installations and rejects conflicts. |
-| `.opencode/agents/` or `~/.config/opencode/agents/` in the installation target | Discovered agent definitions linked from canonical sources. |
+| OpenCode's global or project `plugins` array | Enables the plugin package; no skill or agent discovery links are generated. The former link installer is retired. |
 | `.opencode/pstack-models.json` in the target project | Project-specific pstack role choices. This is pstack data, not an OpenCode configuration field. |
 | `~/.config/opencode/pstack-models.json` | Personal defaults, respecting the configured XDG location when applicable. |
 | `skills/setup-pstack/references/model-configuration.md` | Shared contract for role names, resolution, inheritance, budgets, and panel semantics. All consumers refer to it. |
 | `skills/setup-pstack/scripts/models.mjs` | Validates, resolves, and atomically updates versioned role files. |
+
+The plugin targets `@opencode/plugin` 2.0.18. It registers skills with `skill.transform().add()` and absolute `Skill.Info.path` values inside the package, preserving activation metadata and supporting-file access. The published runtime's `agent.transform().update()` creates missing agents with native defaults; no separate agent-add API or generated agent files are needed. User agent configuration is applied by OpenCode after plugin registration.
 
 Prefer project overrides over personal defaults, resolved per role. Replace a panel list as a whole rather than concatenating it. Keep provider credentials in OpenCode's provider configuration, outside pstack's role file.
 
@@ -168,7 +170,7 @@ These upstream role labels are retained. The removed `architect runners` role is
 
 ## Resolved decisions
 
-1. **Installation:** links preserve root sources; install globally once for use across projects, or explicitly request a project installation. Model setup reuses the available installation and writes only the selected project or personal role file. The source checkout must stay in place.
+1. **Installation:** enable the native plugin globally for use across projects, or in a project's OpenCode configuration. Markdown sources stay at the package root and the plugin registers them directly. Model setup reuses the available plugin and writes only the selected project or personal role file. A local-path installation requires that checkout to stay in place; an installed package carries its own supporting files.
 2. **Role files:** version 1 JSON, project over personal over bundled defaults, merged per role. Panels replace whole lists. The shared helper owns root/worktree/non-Git lookup and rejects invalid files without overwriting them.
 3. **Inheritance:** retain `inherit-parent` and upstream's `auto` alias. Bundled agents have no model pin. User-pinned agents require explicit handling before claiming parent inheritance.
 4. **Reasoning:** leave defaults unpinned. Setup asks for supported variants from the live catalog and preserves choices on rerun.

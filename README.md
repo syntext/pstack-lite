@@ -1,6 +1,6 @@
 # pstack for OpenCode
 
-a lightweight OpenCode V2 adaptation of [pstack](https://github.com/cursor/plugins/tree/main/pstack), created by [Lauren Tan (poteto)](https://x.com/poteto) in the [cursor/plugins repository](https://github.com/cursor/plugins). this repository preserves pstack's relevant git history and [MIT license](./LICENSE).
+a native OpenCode V2 plugin adapting [pstack](https://github.com/cursor/plugins/tree/main/pstack), created by [Lauren Tan (poteto)](https://x.com/poteto) in the [cursor/plugins repository](https://github.com/cursor/plugins). this repository preserves pstack's relevant git history and [MIT license](./LICENSE).
 
 the scope is implementation, investigation, verification, review, and model selection. supply requirements and file references at runtime; no spec tool or artifact format is required. deep planning and standing orchestration programs are excluded. retained skills keep upstream wording and behavior except for these exclusions, OpenCode compatibility, and model selection.
 
@@ -46,22 +46,49 @@ the original files remain available in the preserved upstream history and baseli
 - a standalone repository with pstack's contents at the root and its relevant upstream history preserved.
 - explicit upstream attribution, scope, and implementation status in this README.
 - a [configuration design note](./docs/opencode-configuration-plan.md) with OpenCode V2 behavior, the role inventory, and resolved implementation decisions.
-- a non-destructive link installer, shared role defaults/resolver, and configuration/installation tests.
+- a native `pstack` plugin that registers the bundled skills and agents directly, shared role defaults/resolver, and configuration/package-loading tests.
 
 ## install
 
-requires OpenCode V2, Node.js 22 or newer, and Git. from this checkout:
+requires OpenCode 2.0.18 or a compatible V2 release, Node.js 22 or newer, and Git. from this checkout, install the plugin's dependencies:
 
 ```sh
-# Install once for use across your projects.
-node scripts/install.mjs --global
-# Only when you explicitly want a project-local installation:
-node scripts/install.mjs --project /absolute/path/to/project
+npm ci
 ```
 
-the installer links complete skill directories and both agents into OpenCode's native discovery paths. keep this checkout in place. rerunning is safe; same-name files from another installation produce a conflict rather than being overwritten. project sources work from nested directories too. start a fresh session after installation. this checkout includes its own relative discovery links.
+add the checkout's absolute path to the `plugins` array in your chosen OpenCode configuration, preserving other entries:
 
-with a global installation, `/setup-pstack` creates only `.opencode/pstack-models.json` when you choose project preferences. it reuses the global skills and agents without adding local links. a project using personal or bundled defaults needs no pstack files. setup changes model preferences; installing the bundle is a separate, explicit action.
+```jsonc
+{
+  "$schema": "https://opencode.ai/config.json",
+  "plugins": ["/absolute/path/to/pstack-opencode"]
+}
+```
+
+- **Global:** `~/.config/opencode/opencode.jsonc` (or `$XDG_CONFIG_HOME/opencode/opencode.jsonc`). The plugin is available across projects.
+- **Project:** `<repo>/.opencode/opencode.jsonc`. The plugin is available in that project, including nested working directories.
+
+use the existing `.json` or `.jsonc` file if you already have one. OpenCode resolves relative plugin paths from that config file. Keep this checkout at the configured path; reload OpenCode after enabling the plugin. This checkout's own `.opencode/opencode.json` already enables it through `../`.
+
+the plugin registers all 44 skills and both agents in memory using OpenCode's native plugin API. It creates no skill or agent links and writes no discovery files. Supporting files remain inside the plugin package. Its plugin ID is `pstack`; append `"-pstack"` after its entry to disable it.
+
+with a global plugin installation, `/setup-pstack` creates only `.opencode/pstack-models.json` when you choose project preferences. a project using personal or bundled defaults needs no pstack files. setup changes model preferences; enabling the plugin is a separate, explicit action.
+
+**Migrating from the earlier link installer:** enable the native plugin, then remove only the old pstack-owned discovery links you previously installed. Preserve unrelated or customized files. The plugin does not delete existing installations. The former `scripts/install.mjs` installer has been retired.
+
+### Package distribution
+
+`npm pack` produces a distributable package containing the entry point, skills, agents, and supporting files. No build step is required. This repository has not been published to npm. Once a package or Git repository is published, OpenCode supports `opencode plugin add <package-or-git-spec>` for global installation, or that specification in a project's `plugins` array. See [OpenCode plugin installation](https://opencode.ai/v2/docs/plugins).
+
+### Development checks
+
+```sh
+npm test
+npm run typecheck
+npm run test:integration
+```
+
+the integration test requires `opencode`, `npm`, and Git. It packs and installs the package into a temporary directory, starts isolated OpenCode servers, and exercises global/project loading without using personal configuration or model credentials.
 
 PR tools additionally use authenticated `gh` and Bun. the watcher installs its locked dependencies beside its scripts on first use, so that directory must be writable. app verification uses whatever browser, terminal, simulator, or project harness is available; unavailable verification is reported as a gap.
 

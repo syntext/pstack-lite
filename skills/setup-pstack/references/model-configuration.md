@@ -6,11 +6,11 @@ Read this contract before delegating. Resolve roles from the **target project's 
 node <setup-pstack-base>/scripts/models.mjs read --directory <target-directory>
 ```
 
-`<setup-pstack-base>` is the absolute base directory of the installed setup skill. From another skill it is `../setup-pstack`; from a poteto-mode playbook it is `../../setup-pstack`. Resolve pointers and symlinks before passing them to children. Use the helper instead of guessing the user's home or configuration paths.
+`<setup-pstack-base>` is the absolute base directory of the setup skill supplied by the loaded plugin. From another skill it is `../setup-pstack`; from a poteto-mode playbook it is `../../setup-pstack`. Resolve pointers before passing them to children. Use the helper instead of guessing the user's home or configuration paths.
 
 ## Sources and precedence
 
-Installation and configuration are independent. Globally installed skills and agents read the target project's preferences through this resolver. Project model setup creates only `.opencode/pstack-models.json`; local skill and agent links are needed only for an explicitly requested project installation. A project using personal or bundled defaults needs no pstack configuration file.
+Installation and configuration are independent. A globally enabled plugin supplies skills and agents that read the target project's preferences through this resolver. Project model setup creates only `.opencode/pstack-models.json`. Enabling the plugin in a project's `plugins` array is a separate choice; neither installation scope creates skill or agent links. A project using personal or bundled defaults needs no pstack configuration file.
 
 1. Bundled `default-models.json` supplies recommendations.
 2. `${XDG_CONFIG_HOME:-~/.config}/opencode/pstack-models.json` overrides individual roles for the user.

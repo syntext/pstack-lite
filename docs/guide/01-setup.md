@@ -4,7 +4,7 @@ Install the skills and agents, choose models and reasoning at runtime, then run 
 
 ## Install
 
-From the pstack checkout, run `node scripts/install.mjs --global` once to make the skills and both agents available across projects. Use `node scripts/install.mjs --project /absolute/path/to/your/project` only when you explicitly want a local installation of the bundle. The installer links the original source directories, preserves unrelated files, and refuses same-name conflicts. Keep the checkout in place and start a fresh session. See [installation requirements](../../README.md#install).
+From the pstack checkout, run `npm ci`, then add its absolute path to the `plugins` array in your OpenCode configuration. Use `~/.config/opencode/opencode.jsonc` for global installation or `<repo>/.opencode/opencode.jsonc` for a project installation, respecting an existing `.json` configuration and any XDG override. The native plugin registers all skills and both agents without creating discovery links. Keep the checkout in place and reload OpenCode. See [installation instructions](../../README.md#install).
 
 ## Pick your models
 
@@ -16,7 +16,7 @@ Run:
 
 [`/setup-pstack`](../../skills/setup-pstack/SKILL.md) asks for project or personal scope, detects available models and reasoning variants, shows each role (code delegates, judgment, the review panels), and asks what you want. It writes `.opencode/pstack-models.json` at the target project root or `${XDG_CONFIG_HOME:-~/.config}/opencode/pstack-models.json` for personal defaults.
 
-This scope chooses where preferences are saved, not where the skills are installed. With pstack installed globally, project setup writes only `.opencode/pstack-models.json`. It adds no local skill or agent links. If a required skill or agent is unavailable, setup reports it and offers installation separately. Existing project installations are left in place.
+This scope chooses where preferences are saved, not where the plugin is enabled. With pstack enabled globally, project setup writes only `.opencode/pstack-models.json`. It adds no local skill or agent links. If a required skill or agent is unavailable, setup reports it and checks plugin installation separately. Existing project files are left in place.
 
 You only override what you care about. Project roles override personal roles, which override bundled defaults. Delete an override to restore the lower-priority selection. Rerunning setup preserves prior choices unless you change them. Astra handles the hardest work and judgment, Sol routine implementation, and Luna exploration and small tasks by recommendation; you can override each role. Defaults leave reasoning unpinned. A variant uses `#`, such as `openai/gpt-6-sol#high`.
 

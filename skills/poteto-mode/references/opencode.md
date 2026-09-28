@@ -2,7 +2,7 @@
 
 These conventions translate platform mechanics; the workflow's task and evidence requirements still apply.
 
-Paths to bundled scripts and references are relative to the skill's base directory, not the target project's working directory. Resolve the installed link to its source before finding checkout-level helpers. Run project commands with the target directory as `workdir`; for example, invoke the watcher's absolute script path while working in the target repository.
+Paths to bundled scripts and references are relative to the skill's base directory inside the loaded plugin package, not the target project's working directory. Run project commands with the target directory as `workdir`; for example, invoke the watcher's absolute script path while working in the target repository.
 
 - **Delegation and models:** read `../../setup-pstack/references/model-configuration.md`. Use `poteto-agent` for implementation, `general` for investigation needing shell/MCP tools, and `explore` for read-only code exploration and review. `comment-sicko` is the comment reviewer. A child must receive its scope, model, output paths, and verification requirements explicitly. General-purpose investigation briefs remain report-only even when their tools permit writes; use only read actions on external systems.
 - **Task lists:** use the client's task-list tool when available; otherwise keep a Markdown checklist in the conversation or task artifact. Preserve the playbook's steps and skip reasons.
