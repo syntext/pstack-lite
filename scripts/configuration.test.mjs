@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { test } from 'node:test';
@@ -105,5 +105,24 @@ test('installation conflicts are detected before creating any links', t => {
   writeFileSync(path, 'user-owned agent');
   assert.throws(() => install(destination), /Installation conflict/);
   assert.equal(readFileSync(path, 'utf8'), 'user-owned agent');
+  assert.equal(existsSync(join(destination, 'skills')), false);
+});
+
+test('checkout-wide discovery links are recognized as an existing installation', t => {
+  const { project } = fixture(t);
+  const destination = join(project, '.opencode');
+  mkdirSync(destination);
+  for (const kind of ['skills', 'agents']) {
+    symlinkSync(fileURLToPath(new URL(`../${kind}`, import.meta.url)), join(destination, kind), 'dir');
+  }
+  assert.deepEqual(install(destination), []);
+});
+
+test('dangling same-name links are conflicts before any installation writes', t => {
+  const { project } = fixture(t);
+  const destination = join(project, '.opencode');
+  mkdirSync(join(destination, 'agents'), { recursive: true });
+  symlinkSync('/missing/pstack-agent.md', join(destination, 'agents/poteto-agent.md'));
+  assert.throws(() => install(destination), /Installation conflict/);
   assert.equal(existsSync(join(destination, 'skills')), false);
 });

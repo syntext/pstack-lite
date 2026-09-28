@@ -6,7 +6,7 @@ Read this contract before delegating. Resolve roles from the **target project's 
 node <setup-pstack-base>/scripts/models.mjs read --directory <target-directory>
 ```
 
-`<setup-pstack-base>` is the absolute base directory of the installed setup skill. From another skill it is `../setup-pstack`; from a poteto-mode playbook it is `../../setup-pstack`. Resolve pointers before passing them to children.
+`<setup-pstack-base>` is the absolute base directory of the installed setup skill. From another skill it is `../setup-pstack`; from a poteto-mode playbook it is `../../setup-pstack`. Resolve pointers and symlinks before passing them to children. Use the helper instead of guessing the user's home or configuration paths.
 
 ## Sources and precedence
 
@@ -43,6 +43,8 @@ The full role inventory and defaults live in `default-models.json`. Recommend As
 ## Tool calls
 
 Use OpenCode's `subagent` tool with `agent`, `description`, `prompt`, optional `model`, and `background`. Pass a complete `provider/model#variant` in `model` when a variant was selected. Use the actual advertised tool schema. Continue a child with `sessionID`. Background completion arrives as a notification; do not poll by resuming it.
+
+When a workflow asks for a todo list, use an available task-list tool or a Markdown checklist; do not invent a tool that is not in the current catalog.
 
 OpenCode does not provide Cursor's `readonly`, `environment`, or `cloud_base_branch` call flags. Agent permissions govern access. Worker checkouts are not isolated automatically; create any needed worktree and pass its absolute directory in the brief.
 

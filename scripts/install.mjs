@@ -1,4 +1,4 @@
-import { existsSync, lstatSync, mkdirSync, readdirSync, readlinkSync, symlinkSync } from 'node:fs';
+import { existsSync, lstatSync, mkdirSync, readdirSync, realpathSync, symlinkSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -14,13 +14,14 @@ export function install(destination) {
       if (kind === 'skills' ? !existsSync(join(origin, 'SKILL.md')) : !entry.endsWith('.md')) continue;
       const target = join(resolve(destination), kind, entry);
       try {
-        const stat = lstatSync(target);
-        if (!stat.isSymbolicLink() || resolve(dirname(target), readlinkSync(target)) !== origin) {
-          throw new Error(`Installation conflict: ${target}. Preserve it and choose a different scope or resolve the conflict explicitly.`);
-        }
+        lstatSync(target);
       } catch (error) {
         if (error.code !== 'ENOENT') throw error;
         links.push({ origin, target, kind });
+        continue;
+      }
+      if (!existsSync(target) || realpathSync(target) !== origin) {
+        throw new Error(`Installation conflict: ${target}. Preserve it and choose a different scope or resolve the conflict explicitly.`);
       }
     }
   }
