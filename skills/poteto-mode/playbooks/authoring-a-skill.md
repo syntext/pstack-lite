@@ -2,7 +2,7 @@
 
 **You own the skill's voice.**
 
-1. Use the **create-skill** skill (Cursor's built-in for authoring SKILL.md files).
+1. Write a directory-based OpenCode skill at `.opencode/skills/<id>/SKILL.md` (or the selected personal skill directory). Keep supporting files beside it. Use YAML `name` and `description`; the directory name is the skill ID. For explicit-only discovery use `metadata: { opencode/autoinvoke: false }`. Read the current V2 skills documentation if changing discovery behavior.
 2. Validate the skill: frontmatter has `name` and `description`, referenced files exist, cross-skill links resolve.
 3. Test cases if structural. Skip if subjective.
 4. Run **Opening a PR**.

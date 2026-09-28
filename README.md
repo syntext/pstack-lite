@@ -1,8 +1,8 @@
 # pstack for OpenCode
 
-an in-progress OpenCode adaptation of [pstack](https://github.com/cursor/plugins/tree/main/pstack), created by [Lauren Tan (poteto)](https://x.com/poteto) in the [cursor/plugins repository](https://github.com/cursor/plugins). this repository preserves pstack's relevant git history and [MIT license](./LICENSE).
+a lightweight OpenCode V2 adaptation of [pstack](https://github.com/cursor/plugins/tree/main/pstack), created by [Lauren Tan (poteto)](https://x.com/poteto) in the [cursor/plugins repository](https://github.com/cursor/plugins). this repository preserves pstack's relevant git history and [MIT license](./LICENSE).
 
-the scope is skills, engineering principles, and model selection. the upstream files have been imported; OpenCode installation, agent configuration, and workflow adaptation are still pending. the skill and playbook descriptions below describe the imported workflows, not verified OpenCode support.
+the scope is implementation, investigation, verification, review, and model selection. supply requirements and file references at runtime; no spec tool or artifact format is required. deep planning and standing orchestration programs are excluded. retained skills keep upstream wording and behavior except for these exclusions, OpenCode compatibility, and model selection.
 
 much of this README retains Lauren's original wording. first-person descriptions of pstack's style and philosophy are hers.
 
@@ -26,39 +26,53 @@ fork it. improve it. make it yours. PRs are welcome!
 
 - **Cursor plugin packaging** (`.cursor-plugin/`): removed the manifest and Cursor installation command.
 - **Benny** (`automations/benny/`): removed the optional Slack triage and reproduction automation pack, including its skills, templates, and setup instructions.
-- **Grok Bot UI** (`skills/make-bot-ui/`): removed the routine/webhook integration and its skill listing. this exclusion concerns the bot integration, not Grok as a selectable model.
+- **Grok Bot UI** (`skills/make-bot-ui/`): removed the routine/webhook integration and its skill listing. the port's model set was chosen separately, as described below.
 - **Cursor-only setup advice**: installation of `cursor-team-kit`, `/loop` recommendations, and migration advice for old Cursor model rules have been removed.
+- **Deep planning and orchestration**: removed `architect`, `figure-it-out`, the multi-phase planning playbook and validator, orchestrate and its bookkeeping scripts, both autopilot playbooks, and the autonomous-run playbook. removed their routes and overnight guide; implementation comparison through `arena` remains optional.
 
 the original files remain available in the preserved upstream history and baseline commit `8503161`.
 
-### replaced in this README
+### replaced for OpenCode
 
-- Cursor installation instructions and fixed model defaults now give way to the port's current status and intended setup flow.
-- Cursor-specific subagent invocation syntax has been replaced with descriptions of the two agents.
-- companion-tool installation advice has been replaced with an explicit list of dependencies that need adaptation.
-
-the underlying skills still need replacements for Cursor's `Task` calls, `.cursor` paths, model-rule format, transcript discovery, and cloud-agent assumptions. those runtime changes have not been implemented.
+- Cursor `Task` calls and flags now use OpenCode `subagent` calls and agent permissions. workers share a local environment unless a checkout is prepared explicitly.
+- model rules now use project/personal JSON role overrides and `provider/model#variant` references. defaults recommend Astra for the hardest work and judgment, Sol for implementation, and Luna for exploration and small tasks.
+- Cursor transcript paths now use project-scoped OpenCode session listing/export, with disclosed gaps when history is unavailable.
+- companion-tool dependencies now use available tools or project harnesses. skill authoring uses native OpenCode files; PR watches use completion notifications.
+- activation metadata now uses OpenCode's explicit-only discovery control. sticky mode is a conversation instruction, not an editor hook.
+- Comment Sicko reports proposed changes; the parent applies accepted findings. its review criteria remain the same.
 
 ### added for this port
 
 - a standalone repository with pstack's contents at the root and its relevant upstream history preserved.
 - explicit upstream attribution, scope, and implementation status in this README.
-- a [configuration design note](./docs/opencode-configuration-plan.md) with verified OpenCode V2 behavior, the current role inventory, and decisions for the next implementation step.
+- a [configuration design note](./docs/opencode-configuration-plan.md) with OpenCode V2 behavior, the role inventory, and resolved implementation decisions.
+- a non-destructive link installer, shared role defaults/resolver, and configuration/installation tests.
 
-## installation status
+## install
 
-OpenCode installation instructions will be added after skill discovery, agent definitions, and model configuration have been adapted and verified.
+requires OpenCode V2, Node.js 22 or newer, and Git. from this checkout:
+
+```sh
+# Install in another project (or use . for this checkout).
+node scripts/install.mjs --project /absolute/path/to/project
+# Or install personally, after choosing that scope:
+node scripts/install.mjs --global
+```
+
+the installer links complete skill directories and both agents into OpenCode's native discovery paths. keep this checkout in place. rerunning is safe; same-name files from another installation produce a conflict rather than being overwritten. project sources work from nested directories too. start a fresh session after installation. this checkout includes its own relative discovery links.
+
+PR tools additionally use authenticated `gh` and Bun. the watcher installs its locked dependencies beside its scripts on first use, so that directory must be writable. app verification uses whatever browser, terminal, simulator, or project harness is available; unavailable verification is reported as a gap.
 
 ## get started
 
-the intended entry points remain the same once the OpenCode adaptation is ready:
+two steps:
 
 1. run [`/setup-pstack`](./skills/setup-pstack/SKILL.md), pick a reasoning budget, and choose which models you want.
 2. use [`/poteto-mode`](./skills/poteto-mode/SKILL.md) whenever you're doing anything that requires rigor.
 
-the imported [pstack guide](./docs/guide/README.md) walks through setup, prompting, and verification. it still contains Cursor-specific instructions and needs adaptation.
+the [pstack guide](./docs/guide/README.md) walks through setup, prompting, and verification.
 
-the other skills are situational; the mode skill uses them for you as needed. the mode splits work by model strength across code, prose, judgment, and review panels. adapting [`/setup-pstack`](./skills/setup-pstack/SKILL.md) to configure those roles from available OpenCode models is part of the port.
+the other skills are situational; the mode skill uses them for you as needed. the mode splits work by model strength across code, prose, judgment, and review panels. [`/setup-pstack`](./skills/setup-pstack/SKILL.md) asks for scope, role choices, and supported reasoning variants at runtime. the model set is `openai/gpt-6-astra`, `openai/gpt-6-sol`, and `openai/gpt-6-luna`; defaults leave reasoning unpinned. see the [model contract](./skills/setup-pstack/references/model-configuration.md).
 
 ## usage
 
@@ -66,7 +80,7 @@ use [`/poteto-mode`](./skills/poteto-mode/SKILL.md) at the start of a task. it r
 
 ### just use [`/poteto-mode`](./skills/poteto-mode/SKILL.md)
 
-this skill is the main shortcut. i use it whenever i need the agent to do rigorous engineering work. it comes with twenty-three playbooks:
+this skill is the main shortcut. i use it whenever i need the agent to do rigorous engineering work. this port retains eighteen playbooks:
 
 ```
 /poteto-mode this pr has a subtle bug where the scroll drifts every 750ms even when idle. repro
@@ -74,7 +88,7 @@ first, then fix and verify.
 ```
 
 <details>
-<summary>the twenty-three playbooks</summary>
+<summary>the eighteen playbooks</summary>
 
 | playbook | for |
 |---|---|
@@ -92,13 +106,8 @@ first, then fix and verify.
 | [eval](./skills/poteto-mode/playbooks/eval.md) | test how a skill or prompt change affects agent behavior, blinded. |
 | [babysit](./skills/poteto-mode/playbooks/babysit.md) | drive a pr or a stack to merge-ready: conflicts, review threads, ci. |
 | [shipping](./skills/poteto-mode/playbooks/shipping.md) | independently verify a green stack, then land the contiguous verified run bottom-up through github by default or origin when available. |
-| [autonomous run](./skills/poteto-mode/playbooks/autonomous-run.md) | drive a long task to completion without stopping. |
-| [orchestrate](./skills/poteto-mode/playbooks/orchestrate.md) | a standing project handed to one coordinator chat: multi-day, many stacked prs, fleets of subagents. |
-| [autopilot-full](./skills/poteto-mode/playbooks/autopilot-full.md) | run independent prs to merged with one owner per pr and a root swarm verdict on each round, from the code-ready head on. |
-| [autopilot-stack](./skills/poteto-mode/playbooks/autopilot-stack.md) | build and verify one linear base-branch stack for the operator to review and land. |
 | [session pickup](./skills/poteto-mode/playbooks/session-pickup.md) | resume or take over a prior agent's in-flight work. |
 | [pause safely](./skills/poteto-mode/playbooks/pause-safely.md) | suspend in-flight work cleanly so it can be resumed later. |
-| [multi-phase plan](./skills/poteto-mode/playbooks/multi-phase-plan.md) | work that spans phases or stacked PRs. |
 | [worktree cleanup](./skills/poteto-mode/playbooks/worktree-cleanup.md) | reclaim disk by pruning merged or abandoned worktrees and stale ios simulators, safety-gated. |
 | [opening a pr](./skills/poteto-mode/playbooks/opening-a-pr.md) | open a ready pr from small ordered commits with a conventional commits title and a briefing-style body. invoked at the end of every other playbook. |
 
@@ -114,11 +123,11 @@ when invoked it:
 
 the full rules and playbooks live in [`skills/poteto-mode/SKILL.md`](./skills/poteto-mode/SKILL.md).
 
-[`/poteto-mode`](./skills/poteto-mode/SKILL.md) is also a sticky mode: once entered it stays on across turns, applying itself when a playbook matches or the task needs rigor and staying out of the way otherwise. opt out any time by saying so.
+[`/poteto-mode`](./skills/poteto-mode/SKILL.md) asks the agent to keep the mode active across matching follow-ups. opt out any time by saying so. OpenCode has no bundled Cursor-style mode reminder; reload the skill after a fresh session or lost context.
 
 ## skills
 
-[`/poteto-mode`](./skills/poteto-mode/SKILL.md) runs most of these for you when a step needs them (`how`, `why`, `architect`, `arena`, `swarm`, `interrogate`, `unslop`, `no-comments`, `technical-writing`, `tdd`, and the principles). the table below is for when you want one directly:
+[`/poteto-mode`](./skills/poteto-mode/SKILL.md) runs most of these for you when a step needs them (`how`, `why`, `arena`, `swarm`, `interrogate`, `unslop`, `no-comments`, `technical-writing`, `tdd`, and the principles). the table below is for when you want one directly:
 
 ```
 /how do we cancel runs? do we have an n+1 when we look up every run to cancel?
@@ -138,18 +147,16 @@ the full rules and playbooks live in [`skills/poteto-mode/SKILL.md`](./skills/po
 | [`/why`](./skills/why/SKILL.md) | you want to know why something was built this way. discovers available MCPs at run time and queries each evidence category in parallel (source control, issue tracker, long-form docs, real-time chat, infra observability, error tracking, analytics warehouse). |
 | [`/recall`](./skills/recall/SKILL.md) | you're starting or resuming work and want your recent context on a topic rebuilt from your own chat history and the shared record, handed back as a tight current-state brief. |
 | [`/blast-radius`](./skills/blast-radius/SKILL.md) | you have a small-looking change and want to know what else it could break, with the one fact it's safe because of proven by running code, not asserted. |
-| [`/architect`](./skills/architect/SKILL.md) | you're about to write code that crosses a function boundary and want the caller's usage, types, and module shape settled first. |
 | [`/arena`](./skills/arena/SKILL.md) | you want N parallel attempts at the same thing, then to grab the best parts of each. |
 | [`/swarm`](./skills/swarm/SKILL.md) | you want N parallel workers across different slices or races, then one aggregated report. |
 | [`/interrogate`](./skills/interrogate/SKILL.md) | you have a diff and want several different models to try to break it, including a strict code-quality lens. |
 | [`/automate-me`](./skills/automate-me/SKILL.md) | you want your own `-mode` skill, drafted from how you've actually worked. |
-| [`/setup-pstack`](./skills/setup-pstack/SKILL.md) | you want to pick which models pstack uses per role. detects your models and writes a config rule. |
+| [`/setup-pstack`](./skills/setup-pstack/SKILL.md) | you want to choose installation scope, models per role, and reasoning variants. detects your models and writes role overrides. |
 | [`/reflect`](./skills/reflect/SKILL.md) | a long task landed and you want the recipe captured as a skill edit. |
 | [`/teach`](./skills/teach/SKILL.md) | you want to actually understand a change or subsystem, not just have it summarized. runs how + why and weaves one plain explanation, built up diagram by diagram. |
 | [`/tdd`](./skills/tdd/SKILL.md) | you're fixing a bug and there's a cheap local test path. write the failing test first, then the fix. |
 | [`/no-comments`](./skills/no-comments/SKILL.md) | strip comments before review; spawns Comment Sicko, fixes accepted findings, offers encodings for claimed constraints. |
 | [`/typescript-best-practices`](./skills/typescript-best-practices/SKILL.md) | you're reading or editing typescript. grounds the type-system-discipline principle in syntax. |
-| [`/figure-it-out`](./skills/figure-it-out/SKILL.md) | no bundled playbook fits. designs a rigorous, auditable playbook for the task. |
 | [`/show-me-your-work`](./skills/show-me-your-work/SKILL.md) | you want a reviewable decision trail. logs decisions to a tsv you can commit. |
 | [`/create-verification-skill`](./skills/create-verification-skill/SKILL.md) | your project has no scripted way to prove app behavior. generates a project-local verify skill with a feature map, for any language or platform. |
 | [`/maintain-verification-skill`](./skills/maintain-verification-skill/SKILL.md) | your verify skill's feature map has drifted from the app. source wave + one live pass, at most one PR of proven corrections. |
@@ -177,18 +184,11 @@ perf:              /poteto-mode a big list takes a second or two to load even th
 feature:           /poteto-mode build a small feature behind a feature flag. verify it really works.
 prototype:         /poteto-mode build two prototypes of the markdown renderer so we can compare.
                    spawn an agent for each.
-multi-phase:       /poteto-mode open source these skills as a plugin. nothing internal leaks, work
-                   in a temp dir, show me the dependency graph first.
 babysit:           /poteto-mode check on pr 123. anything outstanding?
 visual parity:     /poteto-mode the row spacing is too tall when this flag is on. the second image
                    is correct. repro and fix until it matches.
-figure it out:     /poteto-mode i'm stepping away. migrate every caller from the synchronous store
-                   to the new async one, keeping behavior identical. i want to trust it was done
-                   right when i'm back.
 how:               /how do we cancel runs? do we have an n+1 when we look up every run to cancel?
 why:               /why is this feature flag not on yet?
-architect:         design this instrumentation to be high signal with no false positives. /architect
-                   this first.
 arena:             /arena take my prompt to the arena verbatim. i want to compare their proposals
                    with yours.
 swarm:             /swarm check every package under packages/ against its check.sh. one worker per
@@ -210,7 +210,7 @@ pstack also ships [poteto-agent](./agents/poteto-agent.md), a subagent that runs
 
 [`/poteto-mode`](./skills/poteto-mode/SKILL.md) and [poteto-agent](./agents/poteto-agent.md) route through the same wrapper.
 
-pstack also ships [Comment Sicko](./agents/comment-sicko.md), a read-only comment reviewer. usually invoke it through [`/no-comments`](./skills/no-comments/SKILL.md), not directly. both agent definitions still need OpenCode configuration.
+pstack also ships [Comment Sicko](./agents/comment-sicko.md), a read-only comment reviewer. usually invoke it through [`/no-comments`](./skills/no-comments/SKILL.md), not directly. both are native OpenCode subagents with no pinned model. at a nesting limit, a leaf does its assigned work directly and the parent owns any separate review stage.
 
 ## principles
 
@@ -247,19 +247,15 @@ twenty-three short skills, one principle each. `poteto-mode` indexes them inline
 
 </details>
 
-## dependencies to adapt
+## runtime capabilities
 
-the imported workflows reference tools that pstack does not bundle:
+the [runtime conventions](./skills/poteto-mode/references/opencode.md) describe tool discovery, live verification, session history, skill authoring, and PR watching. MCP integrations are optional evidence sources. pstack does not bundle credentials, a scheduler, or an external spec/planning tool.
 
-- `/deslop` and the `deslop` skill ship in the `cursor-team-kit` plugin.
-- `control-cli` (for CLIs and TUIs) and `control-ui` (for browser, Electron, web) ship in `cursor-team-kit` too.
-- `/create-skill` is a Cursor built-in.
-
-the OpenCode adaptation needs supported equivalents for these capabilities. the [babysit playbook](./skills/poteto-mode/playbooks/babysit.md) and its GitHub tooling remain useful source material for PR-status workflows.
+see [verification results](./docs/opencode-verification.md) for automated checks, live workflow evidence, and coverage limits.
 
 ## why are there no planning skills?
 
-the best spec is code. if you do want to make a plan, [`/poteto-mode`](./skills/poteto-mode/SKILL.md) covers it, but it's not a default.
+the best spec is code. this port accepts the brief you supply and focuses on implementation and review; deep planning workflows were removed.
 
 ## make it yours
 
@@ -267,7 +263,7 @@ the best spec is code. if you do want to make a plan, [`/poteto-mode`](./skills/
 
 type [`/automate-me`](./skills/automate-me/SKILL.md). it mines your recent transcripts, drafts a `<your-name>-mode` skill from how you've actually worked, and routes through pstack underneath. you keep pstack as the base and end up with your own routing skill alongside `poteto-mode`.
 
-models are configurable too. [`/setup-pstack`](./skills/setup-pstack/SKILL.md) is the entry point for mapping each role (code, judgment, the review panels) to a model. its OpenCode configuration format is still to be implemented.
+models are configurable too. [`/setup-pstack`](./skills/setup-pstack/SKILL.md) maps each role (code, judgment, the review panels) to a model. project overrides live in `.opencode/pstack-models.json`; personal defaults live in `${XDG_CONFIG_HOME:-~/.config}/opencode/pstack-models.json`. rerunning setup preserves existing choices.
 
 ## license
 

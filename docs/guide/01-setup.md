@@ -1,10 +1,10 @@
 # Set up pstack
 
-This guide is imported from upstream. Model setup and workflow instructions below still describe the Cursor implementation and await OpenCode adaptation.
+Install the skills and agents, choose models and reasoning at runtime, then run your first task.
 
-## Installation status
+## Install
 
-Cursor plugin packaging has been removed from this port. OpenCode installation instructions will follow once skill discovery, agent definitions, and model configuration are verified. See the [port status](../../README.md#installation-status).
+From the pstack checkout, run `node scripts/install.mjs --project /absolute/path/to/your/project`, or `node scripts/install.mjs --global` for personal installation. The installer links the original source directories, preserves unrelated files, and refuses same-name conflicts. Keep the checkout in place and start a fresh session. See [installation requirements](../../README.md#install).
 
 ## Pick your models
 
@@ -14,19 +14,19 @@ Run:
 /setup-pstack
 ```
 
-[`/setup-pstack`](../../skills/setup-pstack/SKILL.md) detects the models you have access to, asks for a reasoning budget, shows you each role (code delegates, judgment, the review panels), and asks what you want. Answer the questions. It writes `~/.cursor/rules/pstack-models.mdc`, a small rule every pstack skill reads.
+[`/setup-pstack`](../../skills/setup-pstack/SKILL.md) asks for project or personal scope, detects available models and reasoning variants, shows each role (code delegates, judgment, the review panels), and asks what you want. It writes `.opencode/pstack-models.json` at the target project root or `${XDG_CONFIG_HOME:-~/.config}/opencode/pstack-models.json` for personal defaults.
 
-You only override what you care about. A role with no line in the rule keeps the skill's default. To restore a default, delete that role's line. A rerun of `/setup-pstack` keeps any role whose model differs from the default. A rule written before 0.15.3 pins the old default models, so delete those role lines, or delete the file, then run `/setup-pstack` again.
+You only override what you care about. Project roles override personal roles, which override bundled defaults. Delete an override to restore the lower-priority selection. Rerunning setup preserves prior choices unless you change them. Astra handles the hardest work and judgment, Sol routine implementation, and Luna exploration and small tasks by recommendation; you can override each role. Defaults leave reasoning unpinned. A variant uses `#`, such as `openai/gpt-6-sol#high`.
 
-You might be wondering what happens if you use Auto. Set a role to `inherit-parent` or `auto` and pstack omits the subagent `model` field, so the subagent inherits your parent chat model. Both values mean the same thing, and neither is a model slug. For a panel role the value is a list, and one subagent runs per entry, so the list length sets the panel size. Setup also configures `swarm workers`, the default model for every `/swarm` worker unless a race names a model for each arm.
+Set a role to `inherit-parent` or `auto` to use the parent session model. Both mean the same thing and neither is a model ID. Bundled agents are unpinned; if user configuration pins an agent, the workflow must pass the known parent model explicitly or resolve that conflict. For a panel role the value is a list, and one subagent runs per entry, so the list length sets the panel size. Setup also configures `swarm workers`, the default model for every `/swarm` worker unless a race names a model for each arm.
 
 ## Accept the verification offer, or don't
 
 At the end of setup, `/setup-pstack` looks for a way to prove app behavior in your project, either a `verify-*` skill or an existing harness. If it finds neither, it offers once to generate one with [`/create-verification-skill`](../../skills/create-verification-skill/SKILL.md).
 
-Say yes and it writes `.cursor/skills/verify-<app>/`, a project-local skill that teaches agents to drive your app the way a user does. It proves the skill works once before handing it over. Say no and setup moves on. You can run `/create-verification-skill` yourself any time. [Verify and ship](./06-verify-and-ship.md#create-a-project-verification-skill) covers when it earns its place.
+Say yes and it writes `.opencode/skills/verify-<app>/`, a project-local skill that teaches agents to drive your app the way a user does. It proves the skill works once before handing it over. Say no and setup moves on. You can run `/create-verification-skill` yourself any time. [Verify and ship](./06-verify-and-ship.md#create-a-project-verification-skill) covers when it earns its place.
 
-After setup, start a new chat. The model rule applies to new sessions.
+Start a new chat after installing skills or agents. Model-role files are read before delegation, so later preference updates do not depend on a new chat.
 
 ## Run your first task
 

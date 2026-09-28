@@ -2,7 +2,6 @@
 
 Prompts worth copying, then the mistakes everyone makes once. Swap in your own paths and finish conditions. The recipes are deliberately informal. That's how they get typed in practice, and the skills read intent fine.
 
-![She tastes a finished dish while robots cook from a recipe box, with pinned cards reading /how, /tdd, and /loop above the counter.](./images/recipes.jpg)
 
 ## Understand an unfamiliar subsystem
 
@@ -44,13 +43,13 @@ The qualifiers do real work. "don't change anything yet" keeps it read-only, and
 
 "if there's a cheap test path" matters. Forcing a test through brittle mocks proves less than running the real command, and the playbook is allowed to say so.
 
-## Keep a run honest while you're away
+## Keep a task's decision trail
 
 ```text
-im going to bed, keep going autonomously until every fixture passes. do not stop. keep a decision log i can audit in the morning.
+make every fixture pass. keep a decision log i can audit with the result.
 ```
 
-The full contract is on the [overnight page](./07-overnight.md). The short form works once the task and finish condition are already in the conversation.
+[`/show-me-your-work`](../../skills/show-me-your-work/SKILL.md) owns the log format and evidence audit. The short form works once the task and finish condition are already in the conversation.
 
 ## Redirect a drifting run
 
@@ -80,8 +79,8 @@ That's the whole prompt. [`/bro`](../../skills/bro/SKILL.md) restates the last m
 
 ## The pitfalls
 
-- **Enumerating skills in the prompt.** "use /how then /architect then /arena" reorders steps the playbook already sequences. State the goal and constraints. Name a skill only to override a default.
-- **A vague finish condition.** "make it better" gives `/loop` nothing to check. Give a command or artifact that can pass or fail.
+- **Enumerating skills in the prompt.** "use /how then /arena" reorders steps the playbook already sequences. State the goal and constraints. Name a skill only to override a default.
+- **A vague finish condition.** "make it better" gives the agent nothing to check. Give a command or artifact that can pass or fail.
 - **Parallel agents in one worktree.** They overwrite each other and the diff becomes archaeology. Say "own worktree per attempt" and the isolation is free.
 - **Using `/arena` for coverage.** `/arena` repeats one design or code brief, then picks a base and grafts the best parts. `/swarm` partitions slices or declared race arms and aggregates one report.
 - **Accepting every review comment.** Bots and humans both file real catches and noise in one list. `/interrogate` sorts findings into act-on and dismissed buckets with reasons, and you can override either way.
