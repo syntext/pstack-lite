@@ -79,9 +79,9 @@ Apply the **unslop** skill and the authoring playbook's writing guidelines to ev
 
 Show the draft to the user and take feedback. Expect multiple iterations. Cut ruthlessly. A mode skill is not a manual.
 
-### 6. Land it
+### 6. Finish
 
-Work in a worktree off main. Commit and open a PR. Don't push to main directly.
+Validate the resulting skill and report its local path and the preferences it captures. If the user requested a PR, follow `../poteto-mode/playbooks/opening-a-pr.md`.
 
 ## Guardrails
 

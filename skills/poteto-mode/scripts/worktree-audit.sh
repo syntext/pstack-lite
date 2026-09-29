@@ -1,73 +1,61 @@
 #!/usr/bin/env bash
-# Read-only worktree prune audit. Classifies every git worktree by size, merge
-# state, uncommitted work, and remote/PR state. Session activity requires a
-# separate OpenCode session check. Emits a table sorted by size. Never
-# deletes anything; deletion stays a human-gated step in the playbook.
-#
-# Usage: worktree-audit.sh [repo-path]   (defaults to the current repo)
+# Read-only audit using local Git refs. Usage: worktree-audit.sh [repo-path] [base-ref]
 set -u
 
 repo="${1:-$(git rev-parse --show-toplevel 2>/dev/null)}"
 [ -z "$repo" ] && { echo "not in a git repo; pass a repo path" >&2; exit 1; }
 cd "$repo" || exit 1
 
-# Main worktree is the first entry; everything else is a candidate.
-main_wt=$(git worktree list --porcelain | awk '/^worktree /{print $2; exit}')
+git rev-parse --git-dir >/dev/null 2>&1 || { echo "not in a git repo" >&2; exit 1; }
 
-# origin/main drives the merge check. Best-effort; stale is fine for a first pass.
-git fetch origin main --quiet 2>/dev/null || echo "warn: could not fetch origin/main; merged column may be stale" >&2
-
-# PR state by branch, fetched once. Empty if gh is unavailable.
-prs=$(mktemp)
-gh pr list --author "@me" --state all --limit 1000 \
-	--json number,state,headRefName 2>/dev/null > "$prs" || echo "[]" > "$prs"
+base="${2:-}"
+if [ -z "$base" ]; then
+	default_ref=$(git symbolic-ref --quiet refs/remotes/origin/HEAD 2>/dev/null || true)
+	default_branch=${default_ref#refs/remotes/origin/}
+	for candidate in "refs/heads/$default_branch" "$default_ref" refs/heads/main refs/heads/master; do
+		if [ -n "$candidate" ] && git rev-parse --verify --quiet "${candidate}^{commit}" >/dev/null; then
+			base=$candidate
+			break
+		fi
+	done
+fi
+base_head=""
+if [ -n "$base" ]; then base_head=$(git rev-parse --verify --quiet "${base}^{commit}" 2>/dev/null || true); fi
+printf 'Base: %s (local refs only)\n' "${base:-unknown; pass a base-ref}" >&2
 
 now=$(date +%s)
 
-printf "SIZE\tAGE\tMERGED\tDIRTY\tREMOTE\tPR\tLAST_CHAT\tBUCKET\tWORKTREE\n"
+printf "SIZE\tAGE\tIN_BASE\tDIRTY\tLAST_CHAT\tBUCKET\tWORKTREE\n"
 
-git worktree list --porcelain | awk '/^worktree /{print $2}' | while read -r wt; do
-	[ "$wt" = "$main_wt" ] && continue
+main_wt=""
+while IFS= read -r -d '' field; do
+	case "$field" in 'worktree '*) wt=${field#worktree } ;; *) continue ;; esac
+	if [ -z "$main_wt" ]; then main_wt=$wt; continue; fi
 
 	size=$(du -sh "$wt" 2>/dev/null | awk '{print $1}')
-	head=$(git -C "$wt" rev-parse HEAD 2>/dev/null)
+	head=$(git -C "$wt" rev-parse --verify HEAD 2>/dev/null)
 	head_ts=$(git -C "$wt" log -1 --format='%ct' HEAD 2>/dev/null || echo 0)
 	age=$([ "$head_ts" -gt 0 ] 2>/dev/null && echo "$(( (now - head_ts) / 86400 ))d" || echo "?")
 
-	# Squash-merged branches are not ancestors of main, so PR state is the
-	# real signal; merge-base only catches fast-forward/rebase merges.
-	git merge-base --is-ancestor "$head" origin/main 2>/dev/null && merged=YES || merged=no
+	in_base=unknown
+	if [ -n "$head" ] && [ -n "$base_head" ]; then
+		git merge-base --is-ancestor "$head" "$base_head" 2>/dev/null
+		case $? in 0) in_base=YES ;; 1) in_base=no ;; esac
+	fi
 
-	# Distinguish real WIP (tracked edits) from disposable untracked scratch.
-	porcelain=$(git -C "$wt" status --porcelain 2>/dev/null)
-	if [ -z "$porcelain" ]; then dirty=clean
+	if ! porcelain=$(git -C "$wt" status --porcelain --untracked-files=all 2>/dev/null); then dirty=unknown
+	elif [ -z "$porcelain" ]; then dirty=clean
 	elif printf '%s\n' "$porcelain" | grep -qv '^??'; then
 		dirty="wip:$(printf '%s\n' "$porcelain" | grep -cv '^??')"
-	else dirty="scratch:$(printf '%s\n' "$porcelain" | grep -c '^??')"; fi
+	else dirty="untracked:$(printf '%s\n' "$porcelain" | grep -c '^??')"; fi
 
-	branch=$(git -C "$wt" symbolic-ref --quiet --short HEAD 2>/dev/null || echo "")
-	if [ -z "$branch" ]; then remote=detached
-	elif git -C "$wt" show-ref --verify --quiet "refs/remotes/origin/$branch"; then
-		[ "$(git -C "$wt" rev-parse "origin/$branch" 2>/dev/null)" = "$head" ] \
-			&& remote=pushed \
-			|| remote="ahead$(git -C "$wt" rev-list --count "origin/$branch..HEAD" 2>/dev/null)"
-	else remote=no-remote; fi
-
-	pr=$([ -n "$branch" ] && jq -r --arg b "$branch" \
-		'.[] | select(.headRefName==$b) | "#\(.number)/\(.state)"' "$prs" 2>/dev/null | head -1)
-	[ -z "$pr" ] && pr="-"
-
-	last="check-opencode-session"
-
-	case "$dirty" in wip:*) bucket=hold-wip ;; *)
-		case "$pr" in *OPEN*) bucket=hold-open-pr ;; *)
-			if [ "$merged" = YES ] || [ "$pr" != "-" ]; then bucket=verify-session
-			else bucket=review; fi ;;
-		esac ;;
+	case "$dirty" in
+		wip:*) bucket=hold-wip ;;
+		untracked:*) bucket=hold-untracked ;;
+		clean) if [ "$in_base" = YES ]; then bucket=verify-session; else bucket=review; fi ;;
+		*) bucket=review ;;
 	esac
 
-	printf "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n" \
-		"$size" "$age" "$merged" "$dirty" "$remote" "$pr" "$last" "$bucket" "$wt"
-done | sort -t$'\t' -k1,1 -rh
-
-rm -f "$prs"
+	printf "%s\t%s\t%s\t%s\t%s\t%s\t%s\n" \
+		"${size:-?}" "$age" "$in_base" "$dirty" unknown "$bucket" "$wt"
+done < <(git worktree list --porcelain -z) | sort -t$'\t' -k1,1 -rh

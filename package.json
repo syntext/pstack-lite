@@ -15,8 +15,6 @@
     "agents/",
     "skills/",
     "!skills/**/node_modules/",
-    "!skills/**/*.test.ts",
-    "!skills/**/*.test-helper.ts",
     "LICENSE",
     "README.md",
     "docs/"

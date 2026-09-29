@@ -37,6 +37,8 @@ Spawn all N subagents in one message with `agent: "general"` and `background: tr
 
 Each rationale names the alternatives the candidate considered and what it rejected.
 
+Track the returned session IDs and wait for every candidate's completion notification before Phase C. A file appearing is not completion. If no independent work remains, end the turn and let the notifications resume you; do not launch duplicate candidates or judges as a way to wait.
+
 If a candidate fails to produce output, proceed with N-1 and note the dropout in the synthesis record.
 
 ## Phase C: Cross-judge

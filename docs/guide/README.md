@@ -9,7 +9,7 @@ Here's what you'll learn:
 3. [Understand the code](./03-understand.md). `/how`, `/why`, `/teach`, and `/recall` before you edit anything.
 4. [Compare and review](./04-design.md). Optional `/arena`, bounded `/swarm`, and `/interrogate` against the supplied brief.
 5. [Build and clean the change](./05-build-and-clean.md). The build playbooks, `/tdd`, `/unslop`, and `/no-comments`.
-6. [Verify and ship](./06-verify-and-ship.md). Prove behavior on the real app, then open a focused PR and drive it to merged.
+6. [Verify and finish](./06-verify-and-finish.md). Prove behavior on the real app and finish locally. Request a PR when you want one.
 8. [Steer with principle names](./08-principles.md). The 23 names that redirect an agent mid-task.
 9. [Make it yours](./09-make-it-yours.md). Your own mode, plus how to test a skill change.
 10. [Recipes and pitfalls](./10-recipes-and-pitfalls.md). Prompts to copy and mistakes to skip.

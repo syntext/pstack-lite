@@ -25,7 +25,7 @@ The two compose naturally. `do why first then how` is a perfectly good prompt wh
 ## Actually understand it with `/teach`
 
 ```text
-/teach me how this PR changes retries. convince me it fixes the cause and not the symptom.
+/teach me how this diff changes retries. convince me it fixes the cause and not the symptom.
 ```
 
 [`/teach`](../../skills/teach/SKILL.md) is for when a summary isn't enough. It runs `/how` and `/why`, for a small change maybe just one of them, and weaves the findings into a plain explanation that builds up diagram by diagram. The "convince me" framing is worth stealing. It turns the explanation into an argument you can poke at instead of a tour.

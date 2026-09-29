@@ -8,7 +8,7 @@ poteto-mode is one person's style. The machinery underneath, playbooks, routing,
 /automate-me
 ```
 
-[`/automate-me`](../../skills/automate-me/SKILL.md) mines your available recent session history in the active project for repeated preferences, in how you like replies, delegation, verification, code, prose, and process, then asks you which patterns are really you. If history is unavailable, it asks for examples. It drafts `.opencode/skills/<your-name>-mode/SKILL.md` through the authoring playbook, runs the draft through [`/unslop`](../../skills/unslop/SKILL.md), and opens a PR from a worktree so you review it like any other change.
+[`/automate-me`](../../skills/automate-me/SKILL.md) mines your available recent session history in the active project for repeated preferences, in how you like replies, delegation, verification, code, prose, and process, then asks you which patterns are really you. If history is unavailable, it asks for examples. It drafts `.opencode/skills/<your-name>-mode/SKILL.md` through the authoring playbook, runs the draft through [`/unslop`](../../skills/unslop/SKILL.md), validates it, and reports its local path. You can request a PR for the result.
 
 Run it again whenever your habits drift:
 
@@ -36,9 +36,9 @@ When you already know the workflow you want to capture:
 /poteto-mode write a skill for verifying database migrations in this repo
 ```
 
-Writing a skill matches the [Authoring or modifying a skill playbook](../../skills/poteto-mode/playbooks/authoring-a-skill.md), which uses OpenCode's native skill format, validates the frontmatter and links, and ships the result through the Opening a PR playbook. Agent-facing prose has a higher bar than human prose, because an unhelpful sentence becomes an instruction some future agent follows. Let the playbook hold that bar rather than writing a `SKILL.md` freehand.
+Writing a skill matches the [Authoring or modifying a skill playbook](../../skills/poteto-mode/playbooks/authoring-a-skill.md), which uses OpenCode's native skill format, validates the frontmatter and links, and reports the result locally. It creates a PR only when requested. Agent-facing prose has a higher bar than human prose, because an unhelpful sentence becomes an instruction some future agent follows. Let the playbook hold that bar rather than writing a `SKILL.md` freehand.
 
-One special case has its own generator. A skill that must drive your app and prove behavior is a verification skill, so use [`/create-verification-skill`](../../skills/create-verification-skill/SKILL.md) and [`/maintain-verification-skill`](../../skills/maintain-verification-skill/SKILL.md) instead. [Verify and ship](./06-verify-and-ship.md#create-a-project-verification-skill) covers both.
+One special case has its own generator. A skill that must drive your app and prove behavior is a verification skill, so use [`/create-verification-skill`](../../skills/create-verification-skill/SKILL.md) and [`/maintain-verification-skill`](../../skills/maintain-verification-skill/SKILL.md) instead. [Verify and finish](./06-verify-and-finish.md#create-a-project-verification-skill) covers both.
 
 ## Write docs to a standard with `/technical-writing`
 
@@ -62,6 +62,6 @@ The [Eval playbook](../../skills/poteto-mode/playbooks/eval.md) is built around 
 
 Read every output yourself before accepting the verdict. If you disagree with the judge, suspect the rubric before you suspect your judgment.
 
-**Pitfall:** don't edit a skill mid-task because it's misbehaving. Fix it in its own PR and keep the task moving. A skill edit that ships tangled into feature work is invisible to review and impossible to evaluate.
+**Pitfall:** don't mix a skill repair into unrelated feature work. Keep it in a separate scoped change and keep the task moving. A skill edit tangled into feature work is invisible to review and impossible to evaluate.
 
 Next: [Recipes and pitfalls](./10-recipes-and-pitfalls.md).

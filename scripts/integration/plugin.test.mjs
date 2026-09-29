@@ -70,10 +70,15 @@ test('packed native plugin loads globally and per project without discovery link
   t.after(() => rm(root, { recursive: true, force: true }));
   const packed = JSON.parse((await exec('npm', ['pack', '--json', '--pack-destination', root], { cwd: source })).stdout)[0];
   const files = new Set(packed.files.map(file => file.path));
-  for (const path of ['index.js', 'plugin/index.mjs', 'agents/comment-sicko.md', 'skills/setup-pstack/scripts/models.mjs', 'skills/poteto-mode/scripts/watch-pr/watch-pr', 'skills/poteto-mode/scripts/bun.lock', 'LICENSE']) {
+  for (const path of ['index.js', 'plugin/index.mjs', 'agents/comment-sicko.md', 'skills/setup-pstack/scripts/models.mjs', 'skills/poteto-mode/scripts/worktree-audit.sh', 'skills/show-me-your-work/scripts/log.sh', 'skills/poteto-mode/playbooks/opening-a-pr.md', 'LICENSE']) {
     assert.ok(files.has(path), `Missing package file: ${path}`);
   }
   assert.ok([...files].every(path => !path.includes('node_modules/') && !path.startsWith('.opencode/')));
+  assert.equal([...files].filter(path => /^skills\/poteto-mode\/playbooks\/[^/]+\.md$/.test(path)).length, 16);
+  for (const path of ['playbooks/babysit.md', 'playbooks/shipping.md', 'references/bugbot-triage.md', 'scripts/bootstrap.ts', 'scripts/package.json', 'scripts/bun.lock']) {
+    assert.ok(!files.has(`skills/poteto-mode/${path}`), `Retired asset in package: ${path}`);
+  }
+  assert.ok([...files].every(path => !path.startsWith('skills/poteto-mode/scripts/watch-pr/')));
   const installed = join(root, 'installed');
   await exec('npm', ['install', '--prefix', installed, '--ignore-scripts', '--no-audit', '--no-fund', join(root, packed.filename)], { timeout: 90_000, maxBuffer: 1024 * 1024 });
   const packageRoot = join(installed, 'node_modules/pstack-opencode');
@@ -140,7 +145,8 @@ test('packed native plugin loads globally and per project without discovery link
       const effective = JSON.parse((await exec(process.execPath, [helper, 'read'], { cwd: nested, env: runtime.env })).stdout);
       assert.equal(effective.roles['how explorer'], 'openai/gpt-6-sol#high');
       assert.deepEqual((await readdir(join(project, '.opencode'))).sort(), scope === 'global' ? ['pstack-models.json'] : ['opencode.json', 'pstack-models.json']);
-      await access(join(packageRoot, 'skills/poteto-mode/scripts/watch-pr/watch-pr'), constants.X_OK);
+      await access(join(packageRoot, 'skills/poteto-mode/scripts/worktree-audit.sh'), constants.X_OK);
+      await access(join(packageRoot, 'skills/show-me-your-work/scripts/log.sh'), constants.X_OK);
       await access(join(packageRoot, 'skills/interrogate/references/reviewer-prompt.md'));
 
       await runtime.api('post', '/api/location/reload');

@@ -1,6 +1,6 @@
 # pstack-lite for OpenCode: scope and implementation plan
 
-Status: implemented. The scope and minimal-change boundary below governed the port. See [verification results](./opencode-verification.md) for completed checks and remaining live-workflow coverage.
+Status: implemented and verified on representative end-to-end tasks. The scope and minimal-change boundary below governed the port. Packaged live checks cover configured delegation and reasoning, inheritance, unavailable-choice recovery, nesting-limit handoff, fresh-session pause/resume, Arena panel/judge selection, and local-default/requested-PR outcomes using the requested budget models. See [verification results](./opencode-verification.md) for evidence and coverage limits.
 
 ## Goal
 
@@ -10,10 +10,11 @@ Build a lighter pstack focused on implementation, investigation, verification, a
 
 ## Agreed boundaries
 
-- **Minimal adaptation of retained skills.** Preserve their original wording, steps, principles, review criteria, and behavior except where an agreed removal, OpenCode incompatibility, or selected model configuration requires a change. Every changed passage must have one of those reasons. Review findings identify risks; they do not authorize broader redesign.
+- **Minimal adaptation of retained skills.** Preserve their original wording, steps, principles, review criteria, and behavior except where an agreed removal or workflow simplification, OpenCode incompatibility, or selected model configuration requires a change. Every changed passage must have one of those reasons. Review findings identify risks; they do not authorize broader redesign.
 - Accept requirements, constraints, file references, and acceptance criteria through runtime arguments or task context. No dependency on, named integration with, or required artifact format from an external spec/planning tool.
 - Work against the supplied brief. Surface material gaps rather than generating a competing specification or deep execution plan.
 - Retain bounded parallel implementation and review. Remove long-running coordinator trees, autonomous multi-PR programs, and Cursor-specific cloud/wakeup machinery.
+- Default to verified local changes and a report for solo development. Retain explicit, optional PR creation; remove PR monitoring, bot triage, and automated landing. Keep diff cleanup and small commits independent of PR output.
 - Preserve Lauren Tan's authorship, upstream repository references, and MIT license. Keep original wording wherever it remains useful and accurate.
 - Keep the README's removed/replaced/added record accurate as changes land. Distinguish implemented behavior from planned adaptation.
 - Keep upstream pstack contents at the repository root and retain the relevant git history for future upstream updates.
@@ -45,10 +46,14 @@ Paths are relative to the repository root.
 | `skills/poteto-mode/playbooks/autopilot-full.md` | Autonomous multi-PR execution and merging. |
 | `skills/poteto-mode/playbooks/autopilot-stack.md` | Autonomous stack management. |
 | `skills/poteto-mode/playbooks/autonomous-run.md` | Cursor wakeups and `/loop`-driven execution. |
+| `skills/poteto-mode/playbooks/babysit.md`, `skills/poteto-mode/playbooks/shipping.md` | PR-status loops, stack management, and automated landing exceed the solo-development scope. |
+| `skills/poteto-mode/references/bugbot-triage.md` | Bot-review triage is outside the requested workflow. |
+| `skills/poteto-mode/scripts/watch-pr/` | PR-only polling, status policy, review-thread handling, and associated tests. |
+| `skills/poteto-mode/scripts/bootstrap.ts`, `skills/poteto-mode/scripts/package.json`, `skills/poteto-mode/scripts/bun.lock` | Dependency installation and build/test metadata used only by the retired watcher. Its local dependency directory was removed too. |
 
-Their router entries, model roles, examples, and active documentation links were removed with them. The `architect runners` setup role is gone. The scripts package tests only `watch-pr`; its dependencies and bootstrap code remain.
+Their router entries, model roles, examples, and active documentation links were removed with them. The `architect runners` setup role is gone. The retained model helper, decision logger, and local worktree audit need no Bun dependency installation.
 
-The overnight guide was deleted and navigation repaired. `docs/guide/04-design.md` now covers optional comparison and review. The README catalogs 44 skills and 18 playbooks.
+The overnight guide was deleted and navigation repaired. `docs/guide/04-design.md` covers optional comparison and review; `docs/guide/06-verify-and-finish.md` covers local completion and requested PR output. The README catalogs 44 skills and 16 playbooks.
 
 ## Retain with narrower behavior
 
@@ -59,7 +64,9 @@ The overnight guide was deleted and navigation repaired. `docs/guide/04-design.m
 | `swarm` | Bounded parallel tasks through OpenCode agents; no implicit cloud VM or isolated checkout per worker. |
 | `interrogate` | Multi-model review of changes or supplied requirements/design artifacts, using runtime context rather than a specific spec format. |
 | Feature, bug-fix, refactoring, performance, hillclimb, prototype, and investigation playbooks | Implement or investigate against the supplied brief with evidence appropriate to the task. |
-| PR checking, shipping, and opening a PR | Explicit task-scoped workflows; remove cloud-worker, autonomous-program, and `/loop` assumptions. Retain useful GitHub tooling. |
+| Opening a PR | Explicitly requested output from a reviewed, verified change. Prepare commits and prose, create the PR through an available forge tool, and return its URL. |
+| Worktree cleanup | Audit local refs and uncommitted work; check session activity separately. Uncertain ancestry requires review, with no forge lookup or automatic fetch. |
+| Skill authoring and verification maintenance | Produce validated local changes; PR creation is an optional requested finish. |
 | Pause/resume workflows | Checkpoint and reconstruct task state using supported OpenCode facilities. |
 | Principles, verification, writing, and other retained skills | Preserve portable engineering guidance; adapt platform dependencies and references to removed components. |
 | `setup-pstack`, model-aware skills, and both agents | Shared model selection and bounded delegation through OpenCode. |
@@ -75,7 +82,7 @@ An independent subagent reviewed this plan against the retained sources. Apply o
 - **Check reviewers and callers together.** Preserve their intended responsibilities while translating tool calls and permissions. Comment Sicko and `no-comments` contain conflicting report-only/edit assumptions; flag that ambiguity for a focused decision before changing edit ownership. Remove their references to deleted architect behavior as part of cleanup.
 - **Migrate activation metadata.** Translate `disable-model-invocation`, `mode`, `reminder`, and related Cursor fields only as needed for supported V2 behavior. Preserve existing activation intent and document any unsupported behavior, including sticky mode, rather than inventing a new activation policy.
 
-The review's broader proposals for new execution/retry budgets, Git/PR/worktree policy changes, splitting Reflect roles, or additional utility removals are outside this port unless separately agreed. Existing runtime controls may be reused where a compatibility change requires them. “Bounded” here distinguishes task-scoped delegation from the removed standing orchestration programs; it does not mandate a new timeout framework for every skill.
+The solo-development revision separately authorizes the PR/worktree simplifications described above. Broader proposals for new execution/retry budgets, splitting Reflect roles, or additional utility removals remain outside this port unless separately agreed. Existing runtime controls may be reused where a compatibility change requires them. “Bounded” here distinguishes task-scoped delegation from the removed standing orchestration programs; it does not mandate a new timeout framework for every skill.
 
 ### Capability migration inventory
 
@@ -85,7 +92,7 @@ The review's broader proposals for new execution/retry budgets, Git/PR/worktree 
 | Cursor `create-skill` | Authoring playbook, `automate-me`, `reflect` | Native skill files and documented frontmatter, with available validation. |
 | Cursor transcripts and agent store | `recall`, `reflect`, `automate-me`, `show-me-your-work`, Eval, pause/resume | Verify supported session access; accept supplied context/digests when history is unavailable and disclose their limits. |
 | Cursor delegation flags | Router, workers, reviewers, judges, Eval | Actual OpenCode tool schema, model IDs/variants, supported permissions, and verified delegation depth. Include Eval's different-family judge rule in the model audit. |
-| Bun and adjacent dependency installation | `watch-pr`, `bootstrap.ts`, package manifest/lockfile | Document runtime requirements and verify installed supporting files, executable bits, and dependency installation in a fresh target. |
+| Hosted PR history | `why`, code archaeology, `recall`, blast-radius review | Use local code and Git history first; supplement with hosted context only when available and relevant. |
 
 Define exact role-file lookup rules for repository roots, nested working directories, worktrees, and non-Git projects. Setup and consumers must agree on the same path, override order, and behavior for absent, malformed, or unsupported-version files. Start with a shared documented contract; add resolver code only if necessary.
 
@@ -178,6 +185,7 @@ These upstream role labels are retained. The removed `architect runners` role is
 6. **Catalog:** use OpenCode's model-discovery tool, with CLI/model-selector and user-confirmed availability fallbacks. No OpenChamber dependency.
 7. **Roles:** recommend Astra for hardest work and judgment, Sol for implementation, Luna for exploration and narrow work. Setup can override every role. Default panels use the trio; Reflect retains its shared role.
 8. **Activation:** explicit-only metadata is `opencode/autoinvoke: false`. Mode persistence is a conversation instruction; reload after a fresh session or lost context.
+9. **Completion:** default to reviewed, verified local work. Creating a PR requires an explicit request and ends with its URL. Routine work uses the current checkout; worktrees remain available for isolation.
 
 ## Implementation sequence
 
@@ -192,8 +200,9 @@ These upstream role labels are retained. The removed `architect runners` role is
 ## Acceptance checks
 
 - Removed planning/orchestration components have no active routes, imports, model roles, or broken links remaining. Historical removal notes may name them.
-- Review every retained-file diff against the upstream baseline: each change maps to an agreed removal, necessary OpenCode compatibility, selected model configuration, or directly corresponding documentation. Revert unrelated rewording, policy changes, and workflow redesign.
-- Retained script tests and type checks pass after pruning orchestration tooling; package commands reference only retained components.
+- Removed PR-monitoring and bot-triage components have no active routes or package assets. PR creation remains an explicit-only finish in all callers.
+- Review every retained-file diff against the upstream baseline: each change maps to an agreed removal or workflow simplification, necessary OpenCode compatibility, selected model configuration, or directly corresponding documentation. Revert unrelated rewording, policy changes, and workflow redesign.
+- Retained script tests and type checks pass after pruning orchestration and watcher tooling; package commands reference only retained components.
 - Workflows accept plain runtime instructions or arbitrary supplied file references without requiring an external spec tool, fixed directory layout, or artifact schema.
 - A representative implementation task follows the supplied brief without generating a competing plan, invoking `architect`, or starting an autonomous program.
 - The agreed optional implementation comparison is supported without reintroducing removed design/planning workflows; retained comparison and review criteria remain intact.

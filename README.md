@@ -2,7 +2,7 @@
 
 a native OpenCode V2 plugin adapting [pstack](https://github.com/cursor/plugins/tree/main/pstack), created by [Lauren Tan (poteto)](https://x.com/poteto) in the [cursor/plugins repository](https://github.com/cursor/plugins). this repository preserves pstack's relevant git history and [MIT license](./LICENSE).
 
-the scope is implementation, investigation, verification, review, and model selection. supply requirements and file references at runtime; no spec tool or artifact format is required. deep planning and standing orchestration programs are excluded. retained skills keep upstream wording and behavior except for these exclusions, OpenCode compatibility, and model selection.
+the scope is implementation, investigation, verification, review, and model selection. the default result is verified local work and a concise report; creating a PR is an optional finish when you request it. supply requirements and file references at runtime; no spec tool or artifact format is required. deep planning, standing orchestration, and PR-monitoring programs are excluded. retained skills keep upstream wording and behavior except for these exclusions, OpenCode compatibility, and model selection.
 
 much of this README retains Lauren's original wording. first-person descriptions of pstack's style and philosophy are hers.
 
@@ -29,6 +29,7 @@ fork it. improve it. make it yours. PRs are welcome!
 - **Grok Bot UI** (`skills/make-bot-ui/`): removed the routine/webhook integration and its skill listing. the port's model set was chosen separately, as described below.
 - **Cursor-only setup advice**: installation of `cursor-team-kit`, `/loop` recommendations, and migration advice for old Cursor model rules have been removed.
 - **Deep planning and orchestration**: removed `architect`, `figure-it-out`, the multi-phase planning playbook and validator, orchestrate and its bookkeeping scripts, both autopilot playbooks, and the autonomous-run playbook. removed their routes and overnight guide; implementation comparison through `arena` remains optional.
+- **PR monitoring and automated landing**: removed Babysit, Shipping, Bugbot triage, and `skills/poteto-mode/scripts/watch-pr/`, including its tests, bootstrap, and dedicated Bun dependency bundle.
 
 the original files remain available in the preserved upstream history and baseline commit `8503161`.
 
@@ -37,9 +38,10 @@ the original files remain available in the preserved upstream history and baseli
 - Cursor `Task` calls and flags now use OpenCode `subagent` calls and agent permissions. workers share a local environment unless a checkout is prepared explicitly.
 - model rules now use project/personal JSON role overrides and `provider/model#variant` references. defaults recommend Astra for the hardest work and judgment, Sol for implementation, and Luna for exploration and small tasks.
 - Cursor transcript paths now use project-scoped OpenCode session listing/export, with disclosed gaps when history is unavailable.
-- companion-tool dependencies now use available tools or project harnesses. skill authoring uses native OpenCode files; PR watches use completion notifications.
+- companion-tool dependencies now use available tools or project harnesses. skill authoring uses native OpenCode files.
 - activation metadata now uses OpenCode's explicit-only discovery control. sticky mode is a conversation instruction, not an editor hook.
 - Comment Sicko reports proposed changes; the parent applies accepted findings. its review criteria remain the same.
+- ordinary workflows finish locally. PR creation runs only on request, then returns the URL. worktree auditing uses local Git refs; hosted PR history is optional investigation context.
 
 ### added for this port
 
@@ -76,6 +78,8 @@ with a global plugin installation, `/setup-pstack` creates only `.opencode/pstac
 
 **Migrating from the earlier link installer:** enable the native plugin, then remove only the old pstack-owned discovery links you previously installed. Preserve unrelated or customized files. The plugin does not delete existing installations. The former `scripts/install.mjs` installer has been retired.
 
+an upstream pstack copy in a discovered skills directory can shadow this plugin's matching IDs in OpenCode 2.0.18. disable that old discovery source when migrating, and check that a loaded skill's base directory points inside this plugin package. an active plugin entry alone does not prove which skill body was selected.
+
 ### Package distribution
 
 `npm pack` produces a distributable package containing the entry point, skills, agents, and supporting files. No build step is required. This repository has not been published to npm. Once a package or Git repository is published, OpenCode supports `opencode plugin add <package-or-git-spec>` for global installation, or that specification in a project's `plugins` array. See [OpenCode plugin installation](https://opencode.ai/v2/docs/plugins).
@@ -90,7 +94,7 @@ npm run test:integration
 
 the integration test requires `opencode`, `npm`, and Git. It packs and installs the package into a temporary directory, starts isolated OpenCode servers, and exercises global/project loading without using personal configuration or model credentials.
 
-PR tools additionally use authenticated `gh` and Bun. the watcher installs its locked dependencies beside its scripts on first use, so that directory must be writable. app verification uses whatever browser, terminal, simulator, or project harness is available; unavailable verification is reported as a gap.
+requested PR creation uses an authenticated forge tool, such as `gh` for GitHub. the worktree audit and decision logger use Bash; the bundled helpers need no Bun installation. app verification uses whatever browser, terminal, simulator, or project harness is available; unavailable verification is reported as a gap.
 
 ## get started
 
@@ -109,15 +113,15 @@ use [`/poteto-mode`](./skills/poteto-mode/SKILL.md) at the start of a task. it r
 
 ### just use [`/poteto-mode`](./skills/poteto-mode/SKILL.md)
 
-this skill is the main shortcut. i use it whenever i need the agent to do rigorous engineering work. this port retains eighteen playbooks:
+this skill is the main shortcut. i use it whenever i need the agent to do rigorous engineering work. this port retains sixteen playbooks:
 
 ```
-/poteto-mode this pr has a subtle bug where the scroll drifts every 750ms even when idle. repro
+/poteto-mode this view has a subtle bug where the scroll drifts every 750ms even when idle. repro
 first, then fix and verify.
 ```
 
 <details>
-<summary>the eighteen playbooks</summary>
+<summary>the sixteen playbooks</summary>
 
 | playbook | for |
 |---|---|
@@ -133,12 +137,10 @@ first, then fix and verify.
 | [visual parity](./skills/poteto-mode/playbooks/visual-parity.md) | pixel-exact ui equivalence between two implementations. |
 | [authoring a skill](./skills/poteto-mode/playbooks/authoring-a-skill.md) | writing or editing a SKILL.md. |
 | [eval](./skills/poteto-mode/playbooks/eval.md) | test how a skill or prompt change affects agent behavior, blinded. |
-| [babysit](./skills/poteto-mode/playbooks/babysit.md) | drive a pr or a stack to merge-ready: conflicts, review threads, ci. |
-| [shipping](./skills/poteto-mode/playbooks/shipping.md) | independently verify a green stack, then land the contiguous verified run bottom-up through github by default or origin when available. |
 | [session pickup](./skills/poteto-mode/playbooks/session-pickup.md) | resume or take over a prior agent's in-flight work. |
 | [pause safely](./skills/poteto-mode/playbooks/pause-safely.md) | suspend in-flight work cleanly so it can be resumed later. |
 | [worktree cleanup](./skills/poteto-mode/playbooks/worktree-cleanup.md) | reclaim disk by pruning merged or abandoned worktrees and stale ios simulators, safety-gated. |
-| [opening a pr](./skills/poteto-mode/playbooks/opening-a-pr.md) | open a ready pr from small ordered commits with a conventional commits title and a briefing-style body. invoked at the end of every other playbook. |
+| [opening a pr](./skills/poteto-mode/playbooks/opening-a-pr.md) | when explicitly requested, create a pr for the reviewed and verified change, then return its URL. |
 
 </details>
 
@@ -163,7 +165,7 @@ the full rules and playbooks live in [`skills/poteto-mode/SKILL.md`](./skills/po
 ```
 
 ```
-/interrogate review this pr.
+/interrogate review my local changes.
 ```
 
 <details>
@@ -188,7 +190,7 @@ the full rules and playbooks live in [`skills/poteto-mode/SKILL.md`](./skills/po
 | [`/typescript-best-practices`](./skills/typescript-best-practices/SKILL.md) | you're reading or editing typescript. grounds the type-system-discipline principle in syntax. |
 | [`/show-me-your-work`](./skills/show-me-your-work/SKILL.md) | you want a reviewable decision trail. logs decisions to a tsv you can commit. |
 | [`/create-verification-skill`](./skills/create-verification-skill/SKILL.md) | your project has no scripted way to prove app behavior. generates a project-local verify skill with a feature map, for any language or platform. |
-| [`/maintain-verification-skill`](./skills/maintain-verification-skill/SKILL.md) | your verify skill's feature map has drifted from the app. source wave + one live pass, at most one PR of proven corrections. |
+| [`/maintain-verification-skill`](./skills/maintain-verification-skill/SKILL.md) | your verify skill's feature map has drifted from the app. source wave + one live pass, with scoped local corrections. |
 | [`/unslop`](./skills/unslop/SKILL.md) | you're cleaning up writing. removes AI tells. |
 | [`/bro`](./skills/bro/SKILL.md) | you want the last message restated in plain human language, no jargon. |
 | [`/technical-writing`](./skills/technical-writing/SKILL.md) | layered doc standard (Diátaxis + Google developer style + STE + Global English) for docs, RFCs, readmes, PR descriptions, commit messages. |
@@ -206,14 +208,14 @@ mostly i type [`/poteto-mode`](./skills/poteto-mode/SKILL.md) at the start of a 
 <summary>all the examples</summary>
 
 ```
-bug fix:           /poteto-mode this pr has a subtle bug where the scroll drifts every 750ms even
+bug fix:           /poteto-mode this view has a subtle bug where the scroll drifts every 750ms even
                    when idle. repro first, then fix and verify.
 perf:              /poteto-mode a big list takes a second or two to load even though we virtualize.
                    run a cpu trace and tell me why.
 feature:           /poteto-mode build a small feature behind a feature flag. verify it really works.
 prototype:         /poteto-mode build two prototypes of the markdown renderer so we can compare.
                    spawn an agent for each.
-babysit:           /poteto-mode check on pr 123. anything outstanding?
+optional PR:       /poteto-mode open a pr for this verified change. include the evidence.
 visual parity:     /poteto-mode the row spacing is too tall when this flag is on. the second image
                    is correct. repro and fix until it matches.
 how:               /how do we cancel runs? do we have an n+1 when we look up every run to cancel?
@@ -222,7 +224,7 @@ arena:             /arena take my prompt to the arena verbatim. i want to compar
                    with yours.
 swarm:             /swarm check every package under packages/ against its check.sh. one worker per
                    package. one report.
-interrogate:       /interrogate review this pr.
+interrogate:       /interrogate review my local changes.
 tdd:               /tdd implement
 unslop:            can we unslop and tighten the new changes?
 reflect:           /reflect that took too long. capture what we learned so the next run doesn't
@@ -278,7 +280,7 @@ twenty-three short skills, one principle each. `poteto-mode` indexes them inline
 
 ## runtime capabilities
 
-the [runtime conventions](./skills/poteto-mode/references/opencode.md) describe tool discovery, live verification, session history, skill authoring, and PR watching. MCP integrations are optional evidence sources. pstack does not bundle credentials, a scheduler, or an external spec/planning tool.
+the [runtime conventions](./skills/poteto-mode/references/opencode.md) describe tool discovery, live verification, session history, skill authoring, and optional PR output. MCP integrations are optional evidence sources. pstack does not bundle credentials, a scheduler, or an external spec/planning tool.
 
 see [verification results](./docs/opencode-verification.md) for automated checks, live workflow evidence, and coverage limits.
 

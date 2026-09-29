@@ -18,7 +18,8 @@ Before delegating, read `../setup-pstack/references/model-configuration.md` and 
 Identify what to review from context:
 
 - If the user points at specific files or a diff, use that
-- If on a feature branch, run `git diff main...HEAD` (or the appropriate base branch) for the full changeset
+- For local uncommitted work, inspect staged and unstaged diffs and any untracked files in scope
+- For a branch review, run `git diff <base>...HEAD` using the appropriate base branch
 - If the user's message references recent work, gather the relevant files
 
 Package the diff (or file contents) plus any surrounding context files the reviewers need to understand the code.

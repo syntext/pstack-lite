@@ -37,14 +37,14 @@ The full role inventory and defaults live in `default-models.json`. Recommend As
 ## Selection
 
 - Real selections are `openai/gpt-6-astra`, `openai/gpt-6-sol`, or `openai/gpt-6-luna`, optionally followed by an available `#variant`. Defaults leave reasoning unpinned. Validate availability through the live OpenCode model catalog in the target project before dispatch. Do not invent variants or infer reasoning by editing model-name suffixes.
-- `inherit-parent` and the compatibility alias `auto` mean the actual parent session model. Omit the `model` tool argument only when the selected agent has no configured model. Bundled agents are unpinned. If user configuration pins an agent, pass the known parent reference explicitly or resolve the conflict with the user; do not claim inheritance while running the pinned model.
+- `inherit-parent` and the compatibility alias `auto` mean the actual parent session model. These are role-file aliases, never values for the tool's `model` argument. Omit that argument only when the selected agent has no configured model. Bundled agents are unpinned. If user configuration pins an agent, pass the known parent reference including its reasoning variant explicitly or resolve the conflict with the user; do not claim inheritance while running the pinned model.
 - Panel roles are ordered nonempty lists. One child runs per entry, including repeated models and inheritance entries. Report repetitions rather than claiming model diversity. The `arena cross-judge pool` is a pool from which one judge is selected, preferring a different model ID from the parent. Model identity excludes the `#variant` suffix. No different-provider requirement applies.
-- If a selected model or variant is unavailable, report it and ask for an available selection or parent inheritance. Do not silently switch families, invent a replacement, or edit defaults in a separate PR.
+- If a selected model or variant is unavailable, report it and ask for an available selection or parent inheritance before continuing the delegated stage. After the user chooses, translate that selection into the tool arguments above and resume the stage. Do not bypass the choice by doing the delegated work inline, silently switch families, invent a replacement, or edit defaults in a separate PR.
 - An explicit task-specific model choice overrides the role for that task. For tiny scoped work, propose Luna; keep substantial code on Sol and the hardest tasks on Astra unless configured otherwise.
 
 ## Tool calls
 
-Use OpenCode's `subagent` tool with `agent`, `description`, `prompt`, optional `model`, and `background`. Pass a complete `provider/model#variant` in `model` when a variant was selected. Use the actual advertised tool schema. Continue a child with `sessionID`. Background completion arrives as a notification; do not poll by resuming it.
+Use OpenCode's `subagent` tool with `agent`, `description`, `prompt`, optional `model`, and `background`. Pass a complete `provider/model#variant` in `model` when a variant was selected. Use the actual advertised tool schema. Continue a child with `sessionID`. Background completion arrives as a notification; do not poll by resuming it. If the next step depends on a pending child and no independent work remains, end the turn and wait for its notification. Calling `subagent` without `sessionID` creates another child, not a wait.
 
 When a workflow asks for a todo list, use an available task-list tool or a Markdown checklist; do not invent a tool that is not in the current catalog.
 

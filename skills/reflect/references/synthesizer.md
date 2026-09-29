@@ -24,13 +24,11 @@ Apply each criterion to every finding:
 Drop (implementation details that drift):
 - "linter at SHA `bd91aa7` uses chars/4 heuristic"
 - "`<specific-skill-name>` has 175 tokens at limit 80"
-- "Bugbot flagged regex backtracking on May 2"
 - "we renamed `gpt-4` to `gpt-4o` in `encodingForModel`"
 
 Keep (durable patterns):
 - "closed regex enums for trigger detection are brittle. Prefer schema-validated structures"
 - "skill descriptions front-load trigger keywords (60/40 trigger-vs-action)"
-- "skill-bundled scripts run under bun with own lockfile, not pnpm workspace"
 - "path-shaped triggers belong in `paths:`, not description prose"
 
 Output exactly the format below. No preamble, no narration. One sentence per cell. A reviewer should read each Problem/Proposal pair in 5 seconds.
