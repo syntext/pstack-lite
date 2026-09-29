@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
 
 export const defaults = JSON.parse(readFileSync(new URL('../references/default-models.json', import.meta.url), 'utf8'));
-const reference = /^openai\/gpt-6-(astra|sol|luna)(?:#(none|low|medium|high|xhigh|max))?$/;
+const reference = /^[^/#]+\/[^#]+(?:#[^#]+)?$/;
 
 export function validate(config) {
   if (!config || config.version !== 1 || !config.roles || Array.isArray(config.roles) || typeof config.roles !== 'object') {
@@ -21,10 +21,9 @@ export function validate(config) {
     const selections = Array.isArray(value) ? value : [value];
     if (!selections.length) throw new Error(`Empty panel: ${role}`);
     for (const selection of selections) {
-      if (typeof selection !== 'string' || (!['inherit-parent', 'auto'].includes(selection) && !reference.test(selection))) {
+      if (typeof selection !== 'string' || /\s/.test(selection) || (!['inherit-parent', 'auto'].includes(selection) && !reference.test(selection))) {
         throw new Error(`Invalid model reference for ${role}: ${JSON.stringify(selection)}`);
       }
-      if (selection === 'openai/gpt-6-astra#none') throw new Error('Astra does not advertise the none variant');
     }
   }
   return config;

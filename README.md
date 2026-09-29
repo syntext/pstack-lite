@@ -1,4 +1,4 @@
-# pstack for OpenCode
+# pstack-lite
 
 a native OpenCode V2 plugin adapting [pstack](https://github.com/cursor/plugins/tree/main/pstack), created by [Lauren Tan (poteto)](https://x.com/poteto) in the [cursor/plugins repository](https://github.com/cursor/plugins). this repository preserves pstack's relevant git history and [MIT license](./LICENSE).
 
@@ -26,7 +26,7 @@ fork it. improve it. make it yours. PRs are welcome!
 
 - **Cursor plugin packaging** (`.cursor-plugin/`): removed the manifest and Cursor installation command.
 - **Benny** (`automations/benny/`): removed the optional Slack triage and reproduction automation pack, including its skills, templates, and setup instructions.
-- **Grok Bot UI** (`skills/make-bot-ui/`): removed the routine/webhook integration and its skill listing. the port's model set was chosen separately, as described below.
+- **Grok Bot UI** (`skills/make-bot-ui/`): removed the routine/webhook integration and its skill listing. the port's bundled model defaults were chosen separately, as described below.
 - **Cursor-only setup advice**: installation of `cursor-team-kit`, `/loop` recommendations, and migration advice for old Cursor model rules have been removed.
 - **Deep planning and orchestration**: removed `architect`, `figure-it-out`, the multi-phase planning playbook and validator, orchestrate and its bookkeeping scripts, both autopilot playbooks, and the autonomous-run playbook. removed their routes and overnight guide; implementation comparison through `arena` remains optional.
 - **PR monitoring and automated landing**: removed Babysit, Shipping, Bugbot triage, and `skills/poteto-mode/scripts/watch-pr/`, including its tests, bootstrap, and dedicated Bun dependency bundle.
@@ -52,25 +52,25 @@ the original files remain available in the preserved upstream history and baseli
 
 ## install
 
-requires OpenCode 2.0.18 or a compatible V2 release, Node.js 22 or newer, and Git. from this checkout, install the plugin's dependencies:
+requires OpenCode 2.0.18 or a compatible V2 release, Node.js 22 or newer, and Git. install globally from [syntext/pstack-lite](https://github.com/syntext/pstack-lite):
 
 ```sh
-npm ci
+opencode plugin add github:syntext/pstack-lite
 ```
 
-add the checkout's absolute path to the `plugins` array in your chosen OpenCode configuration, preserving other entries:
+for project installation, add the GitHub repository to the `plugins` array in `<repo>/.opencode/opencode.jsonc`, preserving other entries:
 
 ```jsonc
 {
   "$schema": "https://opencode.ai/config.json",
-  "plugins": ["/absolute/path/to/pstack-opencode"]
+  "plugins": ["github:syntext/pstack-lite"]
 }
 ```
 
 - **Global:** `~/.config/opencode/opencode.jsonc` (or `$XDG_CONFIG_HOME/opencode/opencode.jsonc`). The plugin is available across projects.
 - **Project:** `<repo>/.opencode/opencode.jsonc`. The plugin is available in that project, including nested working directories.
 
-use the existing `.json` or `.jsonc` file if you already have one. OpenCode resolves relative plugin paths from that config file. Keep this checkout at the configured path; reload OpenCode after enabling the plugin. This checkout's own `.opencode/opencode.json` already enables it through `../`.
+use the existing `.json` or `.jsonc` file if you already have one. OpenCode downloads the plugin and installs its dependencies from GitHub. Reload OpenCode after enabling it. See [OpenCode plugin installation](https://opencode.ai/v2/docs/plugins).
 
 the plugin registers all 44 skills and both agents in memory using OpenCode's native plugin API. It creates no skill or agent links and writes no discovery files. Supporting files remain inside the plugin package. Its plugin ID is `pstack`; append `"-pstack"` after its entry to disable it.
 
@@ -82,17 +82,14 @@ an upstream pstack copy in a discovered skills directory can shadow this plugin'
 
 ### Package distribution
 
-`npm pack` produces a distributable package containing the entry point, skills, agents, and supporting files. No build step is required. This repository has not been published to npm. Install globally from [syntext/pstack-lite](https://github.com/syntext/pstack-lite) with:
-
-```sh
-opencode plugin add github:syntext/pstack-lite
-```
-
-For project installation, add `"github:syntext/pstack-lite"` to the project's `plugins` array. See [OpenCode plugin installation](https://opencode.ai/v2/docs/plugins).
+`npm pack` produces a distributable package containing the entry point, skills, agents, and supporting files. No build step is required. This repository has not been published to npm; use the GitHub installation above.
 
 ### Development checks
 
+from a development checkout, install dependencies and run:
+
 ```sh
+npm ci
 npm test
 npm run typecheck
 npm run test:integration
@@ -111,7 +108,7 @@ two steps:
 
 the [pstack guide](./docs/guide/README.md) walks through setup, prompting, and verification.
 
-the other skills are situational; the mode skill uses them for you as needed. the mode splits work by model strength across code, prose, judgment, and review panels. [`/setup-pstack`](./skills/setup-pstack/SKILL.md) asks for scope, role choices, and supported reasoning variants at runtime. the model set is `openai/gpt-6-astra`, `openai/gpt-6-sol`, and `openai/gpt-6-luna`; defaults leave reasoning unpinned. see the [model contract](./skills/setup-pstack/references/model-configuration.md).
+the other skills are situational; the mode skill uses them for you as needed. the mode splits work by model strength across code, prose, judgment, and review panels. [`/setup-pstack`](./skills/setup-pstack/SKILL.md) lets you choose any model available in your OpenCode project, including custom and local models, and any variant that model supports. Astra, Sol, and Luna remain the bundled defaults, with reasoning unpinned. OpenCode supplies the available choices; pstack keeps no provider or variant allowlist. see the [model contract](./skills/setup-pstack/references/model-configuration.md).
 
 ## usage
 

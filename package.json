@@ -1,5 +1,5 @@
 {
-  "name": "pstack-opencode",
+  "name": "pstack-lite",
   "version": "0.1.0",
   "description": "Native OpenCode V2 plugin adapting Lauren Tan's pstack engineering skills and agents",
   "type": "module",

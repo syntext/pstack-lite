@@ -6,7 +6,7 @@ Status: **Completed** (2026-09-29). Implemented and verified on representative e
 
 Build a lighter pstack focused on implementation, investigation, verification, and review. Expose the retained skills and two agents in OpenCode V2, and establish one model-role contract that setup and every retained delegation workflow can share.
 
-“pstack-lite” describes the agreed direction; renaming the repository or skill IDs is not part of this change.
+The repository and package are named `pstack-lite`. The plugin ID remains `pstack`, and the retained skill IDs preserve their upstream names.
 
 ## Agreed boundaries
 
@@ -29,7 +29,7 @@ Build a lighter pstack focused on implementation, investigation, verification, a
 | `0cd5d5e` | Removed `.cursor-plugin/`, `automations/` (Benny), and `skills/make-bot-ui/`; updated documentation. |
 | `67f7b18` | Initial OpenCode configuration research and role inventory in this document. |
 
-The Grok Bot integration was removed as a separate scope decision. The agreed model set for this port is the OpenAI trio below.
+The Grok Bot integration was removed as a separate scope decision. The OpenAI trio below supplies the bundled defaults; model choices are open to any model available in the target OpenCode project.
 
 ## Implemented removals
 
@@ -112,7 +112,7 @@ Checked against the official documentation on 2026-09-28:
 
 Sources: [configuration](https://opencode.ai/v2/docs/config), [skills](https://opencode.ai/v2/docs/skills), [agents](https://opencode.ai/v2/docs/agents), [models](https://opencode.ai/v2/docs/models), [tools](https://opencode.ai/v2/docs/tools).
 
-## Agreed model set and reference format
+## Bundled defaults and model choices
 
 The live OpenCode model catalog confirmed these exact references on 2026-09-28:
 
@@ -124,7 +124,9 @@ The live OpenCode model catalog confirmed these exact references on 2026-09-28:
 
 Use the complete `provider/model` reference in model-role data and native agent configuration. A bare `gpt-6-astra` or a Cursor-style `gpt-6-astra-max` is not the reference format for this port. A selected reasoning variant is appended with `#`, for example `openai/gpt-6-astra#high`. That example illustrates syntax; no reasoning budget has been selected yet. Recheck model and variant availability in the installation target during setup.
 
-Use one entry for each of the three models in default Arena and Interrogate panels. Preserve Reflect's existing shared-role structure. Per the user's ranking, recommend Astra for the hardest work, judgment and synthesis; Sol for routine implementation; Luna for exploration and small, specific tasks. Setup offers these recommendations and lets users choose role assignments, reasoning variants, and configuration scope at runtime. Installation is a separate explicit action. Defaults do not pin reasoning variants. Keep explicit parent inheritance available as described below. Fast model variants with separate `-fast` IDs are outside the selected set.
+Use one entry for each of the three models in default Arena and Interrogate panels. Preserve Reflect's existing shared-role structure. Per the user's ranking, recommend Astra for the hardest work, judgment and synthesis; Sol for routine implementation; Luna for exploration and small, specific tasks. Setup lets users replace any role or panel entry with any model available in their OpenCode project, including custom aliases and local models. OpenCode supplies the supported variants; the historical catalog snapshot above is not an allowlist. Installation is a separate explicit action. Defaults do not pin reasoning variants. Keep explicit parent inheritance available as described below.
+
+The role-file helper validates structure and reference syntax without needing a live provider. Setup and delegation confirm availability through OpenCode's current discovery tools or model selector. Preserve saved choices when unavailable and ask before replacing them.
 
 Adapt reviewer diversity and judge selection to prefer a different **model ID**, rather than requiring a different provider or model family. All three chosen models share the OpenAI provider and GPT-6 family. Update upstream family-prefix fallback rules accordingly; an unavailable selection must lead to an explicit recovery choice, not a silent switch to Claude, Grok, or a guessed model.
 
@@ -183,7 +185,7 @@ These upstream role labels are retained. The removed `architect runners` role is
 4. **Reasoning:** leave defaults unpinned. Setup asks for supported variants from the live catalog and preserves choices on rerun.
 5. **Permissions and depth:** Comment Sicko reports; the parent edits. Leaf agents work directly at a nesting limit and return evidence so the parent can launch the next review stage.
 6. **Catalog:** use OpenCode's model-discovery tool, with CLI/model-selector and user-confirmed availability fallbacks. No OpenChamber dependency.
-7. **Roles:** recommend Astra for hardest work and judgment, Sol for implementation, Luna for exploration and narrow work. Setup can override every role. Default panels use the trio; Reflect retains its shared role.
+7. **Roles:** recommend Astra for hardest work and judgment, Sol for implementation, Luna for exploration and narrow work. Setup can override every role with any model available in the target project. Default panels use the trio; Reflect retains its shared role.
 8. **Activation:** explicit-only metadata is `opencode/autoinvoke: false`. Mode persistence is a conversation instruction; reload after a fresh session or lost context.
 9. **Completion:** default to reviewed, verified local work. Creating a PR requires an explicit request and ends with its URL. Routine work uses the current checkout; worktrees remain available for isolation.
 
@@ -212,6 +214,7 @@ These upstream role labels are retained. The removed `architect runners` role is
 - Explicit invocation and router-triggered loading preserve upstream activation intent wherever V2 supports it. Document any required differences, including cross-turn behavior.
 - A cold target installation includes runnable scripts and supporting files, with documented prerequisites and no dependence on this checkout's `node_modules`. Pause/resume succeeds in a fresh session.
 - Setup can run twice without discarding prior choices or unrelated configuration.
+- Model choices accept any provider, custom alias, local model, and model-specific variant available in OpenCode. Saved references preserve their exact spelling and remain readable without live provider access.
 - A single-role choice and a supported reasoning variant reach the launched child session.
 - Default model references use the exact `openai/gpt-6-astra`, `openai/gpt-6-sol`, and `openai/gpt-6-luna` IDs, with any selected reasoning variant expressed as `#variant`. Retained workflows have no active upstream model-slug defaults or family-prefix fallback rules.
 - Default Arena and Interrogate panels launch the three distinct configured models; Reflect keeps its shared-role mapping. Cross-judging prefers a different model ID without requiring a different provider or family.

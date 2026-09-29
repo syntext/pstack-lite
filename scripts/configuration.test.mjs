@@ -39,6 +39,34 @@ test('nested project resolution overlays roles and replaces panels without reord
   assert.deepEqual(result.roles['arena runners'], ['openai/gpt-6-luna', 'auto', 'openai/gpt-6-luna']);
 });
 
+test('saved model choices preserve provider, alias, local-model, and variant references without live availability', t => {
+  const { project, config } = fixture(t);
+  const paths = locations(project, config);
+  updateModels(paths.global, { version: 1, roles: {
+    'how explorer': 'ollama/gemma3:4b',
+    'hardest tasks': 'openrouter/anthropic/claude-sonnet-4.5#deep-review',
+    'arena runners': ['anthropic/claude-sonnet-4-5'],
+  } });
+  const overrides = { version: 1, roles: {
+    'feature, refactoring': 'custom/team/My.Model:latest#future_budget',
+    'arena runners': [
+      'vllm/Qwen/Qwen3-Coder-30B-A3B-Instruct',
+      'openai/coding-default#fast',
+      'openai/gpt-6-astra#none',
+      'inherit-parent',
+      'auto',
+      'openai/coding-default#fast',
+    ],
+  } };
+  updateModels(paths.project, overrides);
+  assert.deepEqual(JSON.parse(readFileSync(paths.project, 'utf8')), overrides);
+  const result = resolveModels(project, config);
+  assert.equal(result.roles['how explorer'], 'ollama/gemma3:4b');
+  assert.equal(result.roles['hardest tasks'], 'openrouter/anthropic/claude-sonnet-4.5#deep-review');
+  assert.equal(result.roles['feature, refactoring'], 'custom/team/My.Model:latest#future_budget');
+  assert.deepEqual(result.roles['arena runners'], overrides.roles['arena runners']);
+});
+
 test('setup reruns preserve other roles and are idempotent; invalid updates leave files intact', t => {
   const { project, config } = fixture(t);
   const path = locations(project, config).project;
@@ -54,8 +82,13 @@ test('setup reruns preserve other roles and are idempotent; invalid updates leav
     { version: 1, roles: { 'arena runners': [] } },
     { version: 1, roles: { 'bug-fix': 'gpt-6-sol-high' } },
     { version: 1, roles: { 'bug-fix': ['openai/gpt-6-sol'] } },
-    { version: 1, roles: { 'hardest tasks': 'openai/gpt-6-astra#none' } },
     { version: 1, roles: { unknown: 'openai/gpt-6-sol' } },
+    ...[
+      '', 'model-only', '/model', 'provider/', 'provider/#deep', 'provider/model#',
+      'provider#deep/model', 'provider/model#deep#extra',
+      'provider /model', 'provider/my model', 'provider/model#deep review',
+      ' provider/model', 'provider/model\n', null, 42, { model: 'provider/model' },
+    ].map(selection => ({ version: 1, roles: { 'bug-fix': selection } })),
   ]) {
     assert.throws(() => updateModels(path, invalid));
     assert.equal(readFileSync(path, 'utf8'), before);
@@ -91,7 +124,7 @@ test('package helper configures a nested project without installing locally or c
   const nested = join(project, 'src', 'nested');
   mkdirSync(nested, { recursive: true });
   const input = join(root, 'confirmed.json');
-  writeFileSync(input, JSON.stringify({ version: 1, roles: { 'how explorer': 'openai/gpt-6-sol#high' } }));
+  writeFileSync(input, JSON.stringify({ version: 1, roles: { 'how explorer': 'local/coder#careful-pass' } }));
   const run = args => execFileSync(process.execPath, [script, ...args], { cwd: nested, env, encoding: 'utf8' });
 
   assert.equal(run(['write', '--scope', 'project', '--input', input]).trim(), paths.project);
@@ -101,7 +134,7 @@ test('package helper configures a nested project without installing locally or c
   assert.deepEqual(readdirSync(join(project, '.opencode')), ['pstack-models.json']);
   const effective = JSON.parse(run(['read']));
   assert.equal(effective.paths.project, paths.project);
-  assert.equal(effective.roles['how explorer'], 'openai/gpt-6-sol#high');
+  assert.equal(effective.roles['how explorer'], 'local/coder#careful-pass');
   assert.equal(effective.roles['bug-fix'], 'openai/gpt-6-sol');
   assert.equal(readFileSync(paths.global, 'utf8'), personalBefore);
   assert.deepEqual(readdirSync(global, { recursive: true }).sort(), globalBefore);

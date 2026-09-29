@@ -6,7 +6,7 @@ Verification updated for the solo-development revision on 2026-09-29, targeting 
 
 ## Automated checks
 
-- `npm test`: 7 passing tests. Four cover role precedence, nested/worktree/non-Git lookup, panel order, inheritance aliases, variants, idempotent updates, and invalid-file preservation. The package-helper test configures a project from a nested directory, repeats the update, verifies that only `pstack-models.json` was created locally, and confirms personal defaults and another project's effective preferences are unchanged. Three exercise the worktree audit against real local Git repositories: paths with spaces, integrated commits, tracked/untracked work even when Git is configured to hide untracked files, missing refs/checkouts, explicit base selection, and squash-merge ambiguity.
+- `npm test`: 8 passing tests. Five cover role precedence, nested/worktree/non-Git lookup, panel order, inheritance aliases, provider-independent model references and variants, idempotent updates, and invalid-file preservation. The package-helper test configures a project from a nested directory, repeats the update, verifies that only `pstack-models.json` was created locally, and confirms personal defaults and another project's effective preferences are unchanged. Three exercise the worktree audit against real local Git repositories: paths with spaces, integrated commits, tracked/untracked work even when Git is configured to hide untracked files, missing refs/checkouts, explicit base selection, and squash-merge ambiguity.
 - `npm run typecheck`: checks the plugin JavaScript against the installed V2 SDK types.
 - `npm run test:integration`: packs the plugin with `npm pack`, installs that tarball and its runtime dependencies into a fresh directory, then starts isolated OpenCode servers for global and project configurations. Neither test relies on this checkout's discovery links or `node_modules` for the installed plugin. The package contains 16 playbooks, supporting references, the model helper, executable worktree audit and decision logger, and the original license. Package checks exclude retired PR-monitoring/bot-triage assets and their dependency bundle while retaining optional PR creation.
 - Shell syntax checks pass for the worktree audit and decision logger. Markdown links resolve, apart from the intentional `url` placeholder in a reviewer template. `git diff --check` passes.
@@ -19,6 +19,12 @@ Verification updated for the solo-development revision on 2026-09-29, targeting 
 - Both subagents have the original prompts, `subagent` mode, and no bundled model pin. Comment Sicko denies shell, edits, and further delegation while allowing reads. Configured global shell restrictions also apply to the implementation agent. User agent model/variant and description overrides survive registration.
 - The packaged helper writes and resolves a project's model override. With a global plugin, the project's `.opencode/` contains only `pstack-models.json`; a project plugin also has its chosen `opencode.json` entry. No discovery links are generated.
 - Reload preserves skill counts and permission-rule counts. Enabling the same package globally and locally yields one plugin and one copy of each agent. Disabling `pstack` removes the registered skills and agents while preserving model preferences.
+
+## Open model choices follow-up (2026-09-29)
+
+- Checked model references, custom aliases, local models, project-specific availability, and model-specific variants against the current [OpenCode model guide](https://opencode.ai/v2/docs/models). Setup and delegation use OpenCode's available choices; the helper has no provider or variant allowlist.
+- Both packaged installation checks discover a custom model and variant in a real OpenCode catalog, save the selection through the installed helper, and confirm OpenCode preserves it in an agent override. Disabling that model removes it from the catalog while leaving saved preferences readable. No model-generation requests were made for this follow-up.
+- All 8 tests, the 3 packaged integration checks, and typecheck passed. Test files stayed inside the repository, with enclosing Git and plugin configuration isolated during the checks and restored afterward.
 
 ## Live packaged-workflow checks
 

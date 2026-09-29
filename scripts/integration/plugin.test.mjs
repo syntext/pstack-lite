@@ -81,9 +81,9 @@ test('packed native plugin loads globally and per project without discovery link
   assert.ok([...files].every(path => !path.startsWith('skills/poteto-mode/scripts/watch-pr/')));
   const installed = join(root, 'installed');
   await exec('npm', ['install', '--prefix', installed, '--ignore-scripts', '--no-audit', '--no-fund', join(root, packed.filename)], { timeout: 90_000, maxBuffer: 1024 * 1024 });
-  const packageRoot = join(installed, 'node_modules/pstack-opencode');
+  const packageRoot = join(installed, 'node_modules/pstack-lite');
   assert.notEqual(packageRoot, source);
-  assert.equal(fileURLToPath(Host.resolve({ directory: installed, name: 'pstack-opencode' }).server), join(packageRoot, 'index.js'));
+  assert.equal(fileURLToPath(Host.resolve({ directory: installed, name: 'pstack-lite' }).server), join(packageRoot, 'index.js'));
   const expected = await loadBundle();
   assert.equal(expected.skills.length, 44);
   assert.equal(expected.agents.length, 2);
@@ -98,7 +98,19 @@ test('packed native plugin loads globally and per project without discovery link
       await exec('git', ['init', '-q', project]);
       const config = scope === 'global' ? join(home, 'config/opencode/opencode.json') : join(project, '.opencode/opencode.json');
       const entry = scope === 'global' ? packageRoot : relative(dirname(config), packageRoot);
-      const settings = { plugins: [entry], permissions: [{ action: 'shell', resource: '*', effect: 'deny' }] };
+      const settings = {
+        plugins: [entry],
+        permissions: [{ action: 'shell', resource: '*', effect: 'deny' }],
+        providers: {
+          'pstack-test': {
+            package: '@opencode/ai/providers/openai-compatible',
+            settings: { baseURL: 'http://127.0.0.1:9/v1' },
+            models: {
+              'team/Coder:latest': { modelID: 'fixture-model', variants: [{ id: 'careful-pass', settings: { temperature: 0 } }] },
+            },
+          },
+        },
+      };
       await json(config, settings);
       const runtime = await server(t, home, project);
       const list = async (kind, directory = nested) => (await runtime.api('get', `/api/${kind}?location[directory]=${encodeURIComponent(directory)}`)).data;
@@ -140,10 +152,16 @@ test('packed native plugin loads globally and per project without discovery link
 
       const helper = join(packageRoot, 'skills/setup-pstack/scripts/models.mjs');
       const input = join(home, 'confirmed.json');
-      await json(input, { version: 1, roles: { 'how explorer': 'openai/gpt-6-sol#high' } });
+      const catalog = await list('model');
+      const model = catalog.find(model => model.providerID === 'pstack-test' && model.id === 'team/Coder:latest');
+      assert.ok(model?.enabled);
+      assert.equal(model.modelID, 'fixture-model');
+      assert.ok(model.variants.some(variant => variant.id === 'careful-pass'));
+      const selection = `${model.providerID}/${model.id}#careful-pass`;
+      await json(input, { version: 1, roles: { 'how explorer': selection } });
       await exec(process.execPath, [helper, 'write', '--scope', 'project', '--input', input], { cwd: nested, env: runtime.env });
       const effective = JSON.parse((await exec(process.execPath, [helper, 'read'], { cwd: nested, env: runtime.env })).stdout);
-      assert.equal(effective.roles['how explorer'], 'openai/gpt-6-sol#high');
+      assert.equal(effective.roles['how explorer'], 'pstack-test/team/Coder:latest#careful-pass');
       assert.deepEqual((await readdir(join(project, '.opencode'))).sort(), scope === 'global' ? ['pstack-models.json'] : ['opencode.json', 'pstack-models.json']);
       await access(join(packageRoot, 'skills/poteto-mode/scripts/worktree-audit.sh'), constants.X_OK);
       await access(join(packageRoot, 'skills/show-me-your-work/scripts/log.sh'), constants.X_OK);
@@ -164,21 +182,24 @@ test('packed native plugin loads globally and per project without discovery link
         await rm(localConfig);
       }
 
-      settings.agents = { 'poteto-agent': { model: 'openai/gpt-6-astra#high', description: 'User description' } };
+      settings.agents = { 'poteto-agent': { model: effective.roles['how explorer'], description: 'User description' } };
       await json(config, settings);
       await runtime.api('post', '/api/location/reload');
       const customized = await eventually(() => list('agent'), all => all.some(agent => agent.id === 'poteto-agent' && agent.model));
-      assert.equal(customized.find(agent => agent.id === 'poteto-agent').model.variant, 'high');
+      assert.deepEqual(customized.find(agent => agent.id === 'poteto-agent').model, { providerID: 'pstack-test', id: 'team/Coder:latest', variant: 'careful-pass' });
       assert.equal(customized.find(agent => agent.id === 'poteto-agent').description, 'User description');
 
       delete settings.agents;
       settings.plugins = [entry, '-pstack'];
+      settings.providers['pstack-test'].models['team/Coder:latest'].disabled = true;
       await json(config, settings);
       await runtime.api('post', '/api/location/reload');
       const disabled = await list('skill');
       assert.ok(expected.skills.every(skill => !disabled.some(item => item.id === skill.id)));
       assert.ok((await list('agent')).every(agent => !expected.agents.some(item => item.id === agent.id)));
-      assert.equal(JSON.parse(await readFile(join(project, '.opencode/pstack-models.json'), 'utf8')).roles['how explorer'], 'openai/gpt-6-sol#high');
+      assert.ok((await list('model')).every(model => model.providerID !== 'pstack-test' || model.id !== 'team/Coder:latest'));
+      const saved = JSON.parse((await exec(process.execPath, [helper, 'read'], { cwd: nested, env: runtime.env })).stdout);
+      assert.equal(saved.roles['how explorer'], 'pstack-test/team/Coder:latest#careful-pass');
     });
   }
 });
