@@ -17,7 +17,8 @@
     "!skills/**/node_modules/",
     "LICENSE",
     "README.md",
-    "docs/"
+    "docs/",
+    "plan/"
   ],
   "engines": {
     "node": ">=22"

@@ -1,5 +1,7 @@
 # OpenCode port verification
 
+Status: **Completed** (2026-09-29).
+
 Verification updated for the solo-development revision on 2026-09-29, targeting OpenCode 2.0.18. Canonical sources remain at repository root; the native plugin registers them directly from its installed package.
 
 ## Automated checks

@@ -1,6 +1,6 @@
 # pstack-lite for OpenCode: scope and implementation plan
 
-Status: implemented and verified on representative end-to-end tasks. The scope and minimal-change boundary below governed the port. Packaged live checks cover configured delegation and reasoning, inheritance, unavailable-choice recovery, nesting-limit handoff, fresh-session pause/resume, Arena panel/judge selection, and local-default/requested-PR outcomes using the requested budget models. See [verification results](./opencode-verification.md) for evidence and coverage limits.
+Status: **Completed** (2026-09-29). Implemented and verified on representative end-to-end tasks. The scope and minimal-change boundary below governed the port. Packaged live checks cover configured delegation and reasoning, inheritance, unavailable-choice recovery, nesting-limit handoff, fresh-session pause/resume, Arena panel/judge selection, and local-default/requested-PR outcomes using the requested budget models. See [verification results](./opencode-verification.md) for evidence and coverage limits.
 
 ## Goal
 

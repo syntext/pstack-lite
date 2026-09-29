@@ -47,7 +47,7 @@ the original files remain available in the preserved upstream history and baseli
 
 - a standalone repository with pstack's contents at the root and its relevant upstream history preserved.
 - explicit upstream attribution, scope, and implementation status in this README.
-- a [configuration design note](./docs/opencode-configuration-plan.md) with OpenCode V2 behavior, the role inventory, and resolved implementation decisions.
+- a [configuration design note](./plan/opencode-configuration-plan.md) with OpenCode V2 behavior, the role inventory, and resolved implementation decisions.
 - a native `pstack` plugin that registers the bundled skills and agents directly, shared role defaults/resolver, and configuration/package-loading tests.
 
 ## install
@@ -82,7 +82,13 @@ an upstream pstack copy in a discovered skills directory can shadow this plugin'
 
 ### Package distribution
 
-`npm pack` produces a distributable package containing the entry point, skills, agents, and supporting files. No build step is required. This repository has not been published to npm. Once a package or Git repository is published, OpenCode supports `opencode plugin add <package-or-git-spec>` for global installation, or that specification in a project's `plugins` array. See [OpenCode plugin installation](https://opencode.ai/v2/docs/plugins).
+`npm pack` produces a distributable package containing the entry point, skills, agents, and supporting files. No build step is required. This repository has not been published to npm. Install globally from [syntext/pstack-lite](https://github.com/syntext/pstack-lite) with:
+
+```sh
+opencode plugin add github:syntext/pstack-lite
+```
+
+For project installation, add `"github:syntext/pstack-lite"` to the project's `plugins` array. See [OpenCode plugin installation](https://opencode.ai/v2/docs/plugins).
 
 ### Development checks
 
@@ -282,7 +288,7 @@ twenty-three short skills, one principle each. `poteto-mode` indexes them inline
 
 the [runtime conventions](./skills/poteto-mode/references/opencode.md) describe tool discovery, live verification, session history, skill authoring, and optional PR output. MCP integrations are optional evidence sources. pstack does not bundle credentials, a scheduler, or an external spec/planning tool.
 
-see [verification results](./docs/opencode-verification.md) for automated checks, live workflow evidence, and coverage limits.
+see [verification results](./plan/opencode-verification.md) for automated checks, live workflow evidence, and coverage limits.
 
 ## why are there no planning skills?
 
