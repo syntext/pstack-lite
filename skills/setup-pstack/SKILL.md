@@ -46,7 +46,7 @@ node <setup-pstack-base>/scripts/models.mjs write --scope project --directory <t
 # Use --scope global only for confirmed personal defaults.
 ```
 
-The helper validates shape and merges supplied roles with the selected file. It preserves roles not included in the update and writes atomically. To restore inheritance from lower-priority configuration, remove that role from the selected file explicitly and validate it again. The helper validates reference syntax; live availability is the setup skill's responsibility.
+The helper validates shape and merges supplied roles with the selected file. It preserves roles not included in the update and writes atomically. To restore inheritance from lower-priority configuration, remove that role from the selected file explicitly and validate it again. Model selections are opaque strings to the helper; validate models and variants against OpenCode's live catalog, not plugin string rules.
 
 ### 6. Confirm
 

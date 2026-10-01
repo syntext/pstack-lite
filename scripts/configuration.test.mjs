@@ -67,6 +67,45 @@ test('saved model choices preserve provider, alias, local-model, and variant ref
   assert.deepEqual(result.roles['arena runners'], overrides.roles['arena runners']);
 });
 
+test('model selections are opaque strings; OpenCode owns reference and availability validation', t => {
+  const { project, config } = fixture(t);
+  const path = locations(project, config).project;
+  const selections = [
+    'catalog-alias', 'provider/model with spaces#custom variant',
+    'provider/model#future#syntax', ' provider/model ', '',
+  ];
+  for (const selection of selections) {
+    const overrides = { version: 1, roles: { 'bug-fix': selection, 'arena runners': [selection] } };
+    updateModels(path, overrides);
+    assert.deepEqual(JSON.parse(readFileSync(path, 'utf8')), overrides);
+    const result = resolveModels(project, config);
+    assert.equal(result.roles['bug-fix'], selection);
+    assert.deepEqual(result.roles['arena runners'], [selection]);
+  }
+});
+
+test('versioned GPT model references resolve from project files and survive updates', t => {
+  const { project, config } = fixture(t);
+  const path = locations(project, config).project;
+  const overrides = { version: 1, roles: {
+    'bug-fix': 'openai/gpt-6.1-sol#high',
+    'arena runners': ['openai/gpt-6-sol', 'openai/gpt-6.1-sol#high', 'openai/gpt-6.1-sol'],
+  } };
+  mkdirSync(join(project, '.opencode'));
+  writeFileSync(path, JSON.stringify(overrides));
+  const result = resolveModels(project, config);
+  assert.equal(result.roles['bug-fix'], overrides.roles['bug-fix']);
+  assert.deepEqual(result.roles['arena runners'], overrides.roles['arena runners']);
+
+  updateModels(path, overrides);
+  assert.deepEqual(JSON.parse(readFileSync(path, 'utf8')), overrides);
+  const script = fileURLToPath(new URL('../skills/setup-pstack/scripts/models.mjs', import.meta.url));
+  const output = execFileSync(process.execPath, [script, 'read', '--directory', project, '--role', 'bug-fix'], {
+    env: { ...process.env, XDG_CONFIG_HOME: config }, encoding: 'utf8',
+  });
+  assert.equal(JSON.parse(output), 'openai/gpt-6.1-sol#high');
+});
+
 test('setup reruns preserve other roles and are idempotent; invalid updates leave files intact', t => {
   const { project, config } = fixture(t);
   const path = locations(project, config).project;
@@ -80,15 +119,12 @@ test('setup reruns preserve other roles and are idempotent; invalid updates leav
   for (const invalid of [
     { version: 2, roles: {} },
     { version: 1, roles: { 'arena runners': [] } },
-    { version: 1, roles: { 'bug-fix': 'gpt-6-sol-high' } },
     { version: 1, roles: { 'bug-fix': ['openai/gpt-6-sol'] } },
     { version: 1, roles: { unknown: 'openai/gpt-6-sol' } },
     ...[
-      '', 'model-only', '/model', 'provider/', 'provider/#deep', 'provider/model#',
-      'provider#deep/model', 'provider/model#deep#extra',
-      'provider /model', 'provider/my model', 'provider/model#deep review',
-      ' provider/model', 'provider/model\n', null, 42, { model: 'provider/model' },
+      null, 42, true, { model: 'provider/model' },
     ].map(selection => ({ version: 1, roles: { 'bug-fix': selection } })),
+    { version: 1, roles: { 'arena runners': ['auto', null] } },
   ]) {
     assert.throws(() => updateModels(path, invalid));
     assert.equal(readFileSync(path, 'utf8'), before);
