@@ -22,7 +22,7 @@ You only override what you care about. Project roles override personal roles, wh
 
 Choose variants from those OpenCode offers for the selected model, or leave the model's default. A variant uses `#`, such as `openai/gpt-6.1-sol#high`. Availability can differ between projects or change over time. Setup and delegation check with OpenCode; saved preferences remain readable when a provider is unavailable, and the workflow asks before using a replacement.
 
-Set a role to `inherit-parent` or `auto` to use the parent session model. Both mean the same thing and neither is a model ID. Bundled agents are unpinned; if user configuration pins an agent, the workflow must pass the known parent model explicitly or resolve that conflict. For a panel role the value is a list, and one subagent runs per entry, so the list length sets the panel size. Setup also configures `swarm workers`, the default model for every `/swarm` worker unless a race names a model for each arm.
+Set a role to `inherit-parent` or `auto` to use the parent session model. Both mean the same thing and neither is a model ID. The workflow passes the actual parent model and variant explicitly, even when the agent is unpinned. Every subagent call includes `model`; resumes preserve the child's current model and variant. For a panel role the value is a list, and one subagent runs per entry, so the list length sets the panel size. Setup also configures `swarm workers`, the default model for every `/swarm` worker unless a race names a model for each arm.
 
 ## Accept the verification offer, or don't
 

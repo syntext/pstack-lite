@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { execFile, spawn } from 'node:child_process';
 import { once } from 'node:events';
+import { createServer } from 'node:http';
 import { access, mkdir, mkdtemp, readFile, readdir, rm, writeFile } from 'node:fs/promises';
 import { constants } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -68,6 +69,28 @@ async function server(t, root, project) {
 test('packed native plugin loads globally and per project without discovery links', { timeout: 180_000 }, async t => {
   const root = await mkdtemp(join(process.env.TMPDIR || tmpdir(), 'pstack-plugin-'));
   t.after(() => rm(root, { recursive: true, force: true }));
+  const requests = [];
+  const provider = createServer(async (request, response) => {
+    let body = '';
+    for await (const chunk of request) body += chunk;
+    const input = JSON.parse(body);
+    requests.push(input);
+    response.writeHead(200, { 'content-type': 'text/event-stream' });
+    for (const [delta, finish_reason] of [
+      [{ role: 'assistant', content: 'Fixture response.' }, null],
+      [{}, 'stop'],
+    ]) {
+      response.write(`data: ${JSON.stringify({
+        id: 'fixture-completion', object: 'chat.completion.chunk', created: 0, model: 'fixture-model',
+        choices: [{ index: 0, delta, finish_reason }],
+      })}\n\n`);
+    }
+    response.end('data: [DONE]\n\n');
+  });
+  provider.listen(0, '127.0.0.1');
+  await once(provider, 'listening');
+  t.after(() => new Promise(resolve => provider.close(resolve)));
+  const baseURL = `http://127.0.0.1:${provider.address().port}/v1`;
   const packed = JSON.parse((await exec('npm', ['pack', '--json', '--pack-destination', root], { cwd: source })).stdout)[0];
   const files = new Set(packed.files.map(file => file.path));
   for (const path of ['index.js', 'plugin/index.mjs', 'agents/comment-sicko.md', 'skills/setup-pstack/scripts/models.mjs', 'skills/poteto-mode/scripts/worktree-audit.sh', 'skills/show-me-your-work/scripts/log.sh', 'skills/poteto-mode/playbooks/opening-a-pr.md', 'LICENSE']) {
@@ -122,7 +145,7 @@ test('packed native plugin loads globally and per project without discovery link
         providers: {
           'pstack-test': {
             package: '@opencode/ai/providers/openai-compatible',
-            settings: { baseURL: 'http://127.0.0.1:9/v1' },
+            settings: { baseURL, apiKey: 'fixture-key' },
             models: {
               'team/Coder:latest': { modelID: 'fixture-model', variants: [{ id: 'careful-pass', settings: { temperature: 0 } }] },
             },
@@ -132,6 +155,19 @@ test('packed native plugin loads globally and per project without discovery link
       await json(config, settings);
       const runtime = await server(t, home, project);
       const list = async (kind, directory = nested) => (await runtime.api('get', `/api/${kind}?location[directory]=${encodeURIComponent(directory)}`)).data;
+      const advertisedSubagent = async () => {
+        const start = requests.length;
+        const session = (await runtime.api('post', '/api/session', {
+          title: 'Tool guidance fixture',
+          location: { directory: nested },
+          model: { providerID: 'pstack-test', id: 'team/Coder:latest' },
+        })).data;
+        await runtime.api('post', `/api/session/${session.id}/prompt`, { text: 'Inspect the advertised tools.' });
+        const tool = await eventually(() => requests.slice(start).flatMap(request => request.tools ?? [])
+          .find(tool => tool.function?.name === 'subagent'), Boolean);
+        await runtime.api('post', `/api/experimental/session/${session.id}/wait`);
+        return { description: tool.function.description, input: tool.function.parameters };
+      };
       const skills = await eventually(async () => {
         const all = await list('skill');
         const plugin = (await list('plugin')).find(item => item.id === 'pstack');
@@ -167,6 +203,9 @@ test('packed native plugin loads globally and per project without discovery link
         assert.equal(sicko.permissions.filter(rule => ['*', action].includes(rule.action) && rule.resource === '*').at(-1).effect, 'deny');
       }
       assert.equal(sicko.permissions.filter(rule => ['*', 'read'].includes(rule.action) && rule.resource === '*').at(-1).effect, 'allow');
+      const guidedTool = await advertisedSubagent();
+      assert.match(guidedTool.input.properties.model.description, /^Always set model on every subagent call\./);
+      assert.doesNotMatch(guidedTool.input.properties.model.description, /NEVER set this/);
 
       const helper = join(packageRoot, 'skills/setup-pstack/scripts/models.mjs');
       const input = join(home, 'confirmed.json');
@@ -189,6 +228,7 @@ test('packed native plugin loads globally and per project without discovery link
       const reloaded = await eventually(() => list('skill'), all => all.some(skill => skill.id === 'setup-pstack'));
       assert.equal(reloaded.length, skills.length);
       assert.equal((await list('agent')).find(agent => agent.id === 'comment-sicko').permissions.length, sicko.permissions.length);
+      assert.deepEqual(await advertisedSubagent(), guidedTool);
 
       if (scope === 'global') {
         const localConfig = join(project, '.opencode/opencode.json');
@@ -209,6 +249,14 @@ test('packed native plugin loads globally and per project without discovery link
 
       delete settings.agents;
       settings.plugins = [entry, '-pstack'];
+      await json(config, settings);
+      await runtime.api('post', '/api/location/reload');
+      const originalTool = await advertisedSubagent();
+      assert.doesNotMatch(originalTool.input.properties.model.description, /Always set model on every subagent call/);
+      assert.deepEqual({
+        ...guidedTool.input,
+        properties: { ...guidedTool.input.properties, model: originalTool.input.properties.model },
+      }, originalTool.input);
       settings.providers['pstack-test'].models['team/Coder:latest'].disabled = true;
       await json(config, settings);
       await runtime.api('post', '/api/location/reload');
