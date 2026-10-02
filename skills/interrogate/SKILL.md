@@ -41,9 +41,9 @@ Launch all reviewers in a single message using the `subagent` tool. Use the `int
 
 | Subagent | Default model |
 |----------|---------------|
-| Reviewer A | `openai/gpt-6-astra` |
-| Reviewer B | `openai/gpt-6-sol` |
-| Reviewer C | `openai/gpt-6-luna` |
+| Reviewer A | `openai/gpt-6.1-sol#max` |
+| Reviewer B | `openai/gpt-6-astra#max` |
+| Reviewer C | `openai/gpt-6-luna-fast#xhigh` |
 
 For each reviewer:
 - `agent`: `explore`

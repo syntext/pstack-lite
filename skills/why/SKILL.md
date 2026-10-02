@@ -82,7 +82,7 @@ Launch all matching investigators in a single message so they run concurrently. 
 
 Subagent config (each):
 - `agent`: `general`
-- `model`: the `why investigators` role, default `openai/gpt-6-luna`
+- `model`: the `why investigators` role, default `openai/gpt-6-luna-fast#xhigh`
 - Include a report-only brief. Investigators use read operations on Git and available MCP sources; they must not write files or external records. OpenCode agent permissions govern actual tool access.
 
 Each investigator gets:
@@ -126,7 +126,7 @@ If your scope assessment suggests a single-commit trivial target where the commi
 Spawn one synthesizer subagent:
 
 - `agent`: `general`
-- `model`: the `why synthesizer` role, default `openai/gpt-6-astra`
+- `model`: the `why synthesizer` role, default `openai/gpt-6.1-sol#max`
 - Include a report-only brief. The synthesizer may spot-verify citations through available read tools but must not write files or external records.
 
 The synthesizer gets:

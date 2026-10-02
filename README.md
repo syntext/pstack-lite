@@ -36,7 +36,7 @@ the original files remain available in the preserved upstream history and baseli
 ### replaced for OpenCode
 
 - Cursor `Task` calls and flags now use OpenCode `subagent` calls and agent permissions. workers share a local environment unless a checkout is prepared explicitly.
-- model rules now use project/personal JSON role overrides and `provider/model#variant` references. defaults recommend Astra for the hardest work and judgment, Sol for implementation, and Luna for exploration and small tasks.
+- model rules now use project/personal JSON role overrides and `provider/model#variant` references. defaults recommend Luna 6 Fast (`xhigh`) for routine implementation and exploration, Sol 6.1 (`max`) for the hardest work and judgment, and Astra 6 (`max`) only in multi-model panels and the Arena cross-judge pool.
 - Cursor transcript paths now use project-scoped OpenCode session listing/export, with disclosed gaps when history is unavailable.
 - companion-tool dependencies now use available tools or project harnesses. skill authoring uses native OpenCode files.
 - activation metadata now uses OpenCode's explicit-only discovery control. sticky mode is a conversation instruction, not an editor hook.
@@ -109,7 +109,7 @@ two steps:
 
 the [pstack guide](./docs/guide/README.md) walks through setup, prompting, and verification.
 
-the other skills are situational; the mode skill uses them for you as needed. the mode splits work by model strength across code, prose, judgment, and review panels. [`/setup-pstack`](./skills/setup-pstack/SKILL.md) lets you choose any model available in your OpenCode project, including custom and local models, and any variant that model supports. Astra, Sol, and Luna remain the bundled defaults, with reasoning unpinned. OpenCode supplies the available choices; pstack keeps no provider or variant allowlist. see the [model contract](./skills/setup-pstack/references/model-configuration.md).
+the other skills are situational; the mode skill uses them for you as needed. the mode splits work by model strength across code, prose, judgment, and review panels. [`/setup-pstack`](./skills/setup-pstack/SKILL.md) lets you choose any model available in your OpenCode project, including custom and local models, and any variant that model supports. bundled defaults use `openai/gpt-6-luna-fast#xhigh`, `openai/gpt-6.1-sol#max`, and `openai/gpt-6-astra#max`. OpenCode supplies the available choices; pstack keeps no provider or variant allowlist. see the [model contract](./skills/setup-pstack/references/model-configuration.md).
 
 ## usage
 

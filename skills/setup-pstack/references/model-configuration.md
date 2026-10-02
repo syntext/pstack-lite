@@ -24,19 +24,19 @@ Each file is JSON with `"version": 1` and a `"roles"` object. Partial role maps 
 {
   "version": 1,
   "roles": {
-    "feature, refactoring": "openai/gpt-6-sol",
-    "hardest tasks": "openai/gpt-6-astra",
-    "how explorer": "openai/gpt-6-luna",
-    "arena runners": ["openai/gpt-6-astra", "openai/gpt-6-sol", "openai/gpt-6-luna"]
+    "feature, refactoring": "openai/gpt-6-luna-fast#xhigh",
+    "hardest tasks": "openai/gpt-6.1-sol#max",
+    "how explorer": "openai/gpt-6-luna-fast#xhigh",
+    "arena runners": ["openai/gpt-6.1-sol#max", "openai/gpt-6-astra#max", "openai/gpt-6-luna-fast#xhigh"]
   }
 }
 ```
 
-The full role inventory and defaults live in `default-models.json`. They recommend Astra for the hardest work and judgment, Sol for routine implementation, and Luna for exploration and small, specific work. Every role and panel entry can instead use any model available in the target project, including custom and local models. Reflect keeps its upstream shared judgment/divergent/synthesizer role. Neither default models nor this file configure credentials.
+The full role inventory and defaults live in `default-models.json`. They recommend Luna 6 Fast with `xhigh` reasoning for routine implementation and exploration, and Sol 6.1 with `max` reasoning for the hardest work, judgment, synthesis, and reflection tooling. Astra 6 with `max` reasoning joins Sol and Luna in multi-model panels and the Arena cross-judge pool. Every role and panel entry can instead use any model available in the target project, including custom and local models. Reflect keeps its upstream shared judgment/divergent/synthesizer role. Neither default models nor this file configure credentials.
 
 ## Selection
 
-- Real selections use `provider/model`, optionally followed by an available `#variant`. Copy the exact reference from OpenCode's available models in the target project, preserving case, additional model-name slashes, and custom aliases. Defaults leave reasoning unpinned. Use OpenCode's current discovery tools or model selector to confirm availability during setup and before dispatch. Variants belong to the selected model; do not invent them or infer reasoning by editing model-name suffixes. See [OpenCode's model guide](https://opencode.ai/v2/docs/models).
+- Real selections use `provider/model`, optionally followed by an available `#variant`. Copy the exact reference from OpenCode's available models in the target project, preserving case, additional model-name slashes, and custom aliases. Bundled defaults pin reasoning variants; overrides may select a model's default by omitting `#variant`. Use OpenCode's current discovery tools or model selector to confirm availability during setup and before dispatch. Variants belong to the selected model; do not invent them or infer reasoning by editing model-name suffixes. See [OpenCode's model guide](https://opencode.ai/v2/docs/models).
 - The helper checks file structure and that selections are strings only. It preserves model selections verbatim, without reference patterns or provider, model, or variant allowlists. OpenCode's live catalog is the authority on usable models and variants during setup and before dispatch. Reading saved preferences needs no connected provider or live catalog; a temporarily unavailable choice remains saved until the user changes it.
 - `inherit-parent` and the compatibility alias `auto` mean the actual parent session model. These are role-file aliases, never values for the tool's `model` argument. Omit that argument only when the selected agent has no configured model. Bundled agents are unpinned. If user configuration pins an agent, pass the known parent reference including its reasoning variant explicitly or resolve the conflict with the user; do not claim inheritance while running the pinned model.
 - Panel roles are ordered nonempty lists. One child runs per entry, including repeated models and inheritance entries. Report repetitions rather than claiming model diversity. The `arena cross-judge pool` is a pool from which one judge is selected, preferring a different model ID from the parent. Model identity excludes the `#variant` suffix. No different-provider requirement applies.

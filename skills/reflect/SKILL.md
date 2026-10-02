@@ -27,15 +27,15 @@ Read `../setup-pstack/references/model-configuration.md` and resolve roles for t
 
 | Lens | Role line | Default `model` | Prompt template |
 |---|---|---|---|
-| Judgment | `reflect judgment, divergent, synthesizer` | `openai/gpt-6-astra` | `references/judgment-reviewer.md` |
-| Tooling | `reflect tooling` | `openai/gpt-6-sol` | `references/tooling-reviewer.md` |
-| Divergent | `reflect judgment, divergent, synthesizer` | `openai/gpt-6-astra` | `references/divergent-reviewer.md` |
+| Judgment | `reflect judgment, divergent, synthesizer` | `openai/gpt-6.1-sol#max` | `references/judgment-reviewer.md` |
+| Tooling | `reflect tooling` | `openai/gpt-6.1-sol#max` | `references/tooling-reviewer.md` |
+| Divergent | `reflect judgment, divergent, synthesizer` | `openai/gpt-6.1-sol#max` | `references/divergent-reviewer.md` |
 
 Pass each template verbatim, substituting the transcript path or digest where marked. Reviewers return findings in the `subagent` response body.
 
 ### 3. Synthesize
 
-One `subagent` call, `agent: "general"`, with `model` from the `reflect judgment, divergent, synthesizer` role (default `openai/gpt-6-astra`). The synthesizer's quality check includes spot-verifying citations through available read tools; its brief prohibits edits. Use `references/synthesizer.md` verbatim, with each reviewer's full output inlined where marked. The synthesizer returns a structured Accepted / Rejected / Backlog list.
+One `subagent` call, `agent: "general"`, with `model` from the `reflect judgment, divergent, synthesizer` role (default `openai/gpt-6.1-sol#max`). The synthesizer's quality check includes spot-verifying citations through available read tools; its brief prohibits edits. Use `references/synthesizer.md` verbatim, with each reviewer's full output inlined where marked. The synthesizer returns a structured Accepted / Rejected / Backlog list.
 
 ### 4. Structural enforcement check
 

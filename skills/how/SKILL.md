@@ -25,7 +25,7 @@ When in doubt, take the simple path.
 Decompose the question into 2 to 4 exploration angles, each a distinct slice of the subsystem. Spawn all explorers in a single message:
 
 - `agent`: `explore`
-- `model`: the `how explorer` role, default `openai/gpt-6-luna`
+- `model`: the `how explorer` role, default `openai/gpt-6-luna-fast#xhigh`
 
 Each explorer gets the prompt in `references/explorer-prompt.md` with its angle filled in. Then go to Step 3.
 
@@ -34,7 +34,7 @@ Each explorer gets the prompt in `references/explorer-prompt.md` with its angle 
 Spawn one subagent that explores and explains in one pass:
 
 - `agent`: `explore`
-- `model`: the `how explainer` role, default `openai/gpt-6-astra`
+- `model`: the `how explainer` role, default `openai/gpt-6.1-sol#max`
 
 Build its prompt from `references/explainer-prompt.md` without the explorer-findings section. Go to Step 4.
 
@@ -43,7 +43,7 @@ Build its prompt from `references/explainer-prompt.md` without the explorer-find
 Once all explorers have returned, spawn one subagent to synthesize their findings into one explanation:
 
 - `agent`: `explore`
-- `model`: the `how explainer` role, default `openai/gpt-6-astra`
+- `model`: the `how explainer` role, default `openai/gpt-6.1-sol#max`
 
 Build its prompt from `references/explainer-prompt.md` with every explorer's findings filled in.
 

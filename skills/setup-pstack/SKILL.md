@@ -17,7 +17,7 @@ Check the target project's available skills and agents, including `poteto-agent`
 
 Discover the target project's available models through OpenCode's current model-discovery tools or `/models` selector. Include any available provider, custom alias, or local model. Use the exact catalog references, not display names or guessed provider IDs. Confirm supported variants from the same catalog; if the available interface does not expose them, ask the user for the available selections. Never write a new or changed model/variant choice without confirming availability. `inherit-parent` and `auto` are always valid choices.
 
-The bundled defaults recommend Astra for the hardest work and judgment, Sol for routine implementation, and Luna for exploration and small, specific work. Every role can use any model available in the target project. Help the user choose based on the task and budget; the defaults are starting points, not a restricted list.
+The bundled defaults recommend Luna 6 Fast with `xhigh` reasoning for routine implementation and exploration, and Sol 6.1 with `max` reasoning for the hardest work, judgment, synthesis, and reflection tooling. Astra 6 with `max` reasoning joins Sol and Luna in multi-model panels and the Arena cross-judge pool. Every role can use any model available in the target project. Help the user choose based on the task and budget; the defaults are starting points, not a restricted list.
 
 ### 2. Load current state
 

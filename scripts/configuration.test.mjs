@@ -17,6 +17,31 @@ function fixture(t) {
   return { root, project, config };
 }
 
+test('bundled defaults pin Luna Fast workers, Sol judgment, and ordered three-model panels', t => {
+  const { project, config } = fixture(t);
+  const luna = 'openai/gpt-6-luna-fast#xhigh';
+  const sol = 'openai/gpt-6.1-sol#max';
+  const panel = [sol, 'openai/gpt-6-astra#max', luna];
+  assert.deepEqual(resolveModels(project, config).roles, {
+    'feature, refactoring': luna,
+    'bug-fix': luna,
+    'perf-issue': luna,
+    'hillclimb': luna,
+    'judgment and prose': sol,
+    'hardest tasks': sol,
+    'how explorer': luna,
+    'how explainer': sol,
+    'why investigators': luna,
+    'why synthesizer': sol,
+    'reflect tooling': sol,
+    'reflect judgment, divergent, synthesizer': sol,
+    'arena runners': panel,
+    'arena cross-judge pool': panel,
+    'swarm workers': luna,
+    'interrogate reviewers': panel,
+  });
+});
+
 test('nested project resolution overlays roles and replaces panels without reordering', t => {
   const { project, config } = fixture(t);
   const paths = locations(project, config);
@@ -35,7 +60,7 @@ test('nested project resolution overlays roles and replaces panels without reord
   assert.equal(result.paths.project, paths.project);
   assert.equal(result.roles['how explorer'], 'inherit-parent');
   assert.equal(result.roles['hardest tasks'], 'openai/gpt-6-astra#max');
-  assert.equal(result.roles['bug-fix'], 'openai/gpt-6-sol');
+  assert.equal(result.roles['bug-fix'], 'openai/gpt-6-luna-fast#xhigh');
   assert.deepEqual(result.roles['arena runners'], ['openai/gpt-6-luna', 'auto', 'openai/gpt-6-luna']);
 });
 
@@ -171,7 +196,7 @@ test('package helper configures a nested project without installing locally or c
   const effective = JSON.parse(run(['read']));
   assert.equal(effective.paths.project, paths.project);
   assert.equal(effective.roles['how explorer'], 'local/coder#careful-pass');
-  assert.equal(effective.roles['bug-fix'], 'openai/gpt-6-sol');
+  assert.equal(effective.roles['bug-fix'], 'openai/gpt-6-luna-fast#xhigh');
   assert.equal(readFileSync(paths.global, 'utf8'), personalBefore);
   assert.deepEqual(readdirSync(global, { recursive: true }).sort(), globalBefore);
 

@@ -1,21 +1,21 @@
 {
   "version": 1,
   "roles": {
-    "feature, refactoring": "openai/gpt-6-sol",
-    "bug-fix": "openai/gpt-6-sol",
-    "perf-issue": "openai/gpt-6-sol",
-    "hillclimb": "openai/gpt-6-sol",
-    "judgment and prose": "openai/gpt-6-astra",
-    "hardest tasks": "openai/gpt-6-astra",
-    "how explorer": "openai/gpt-6-luna",
-    "how explainer": "openai/gpt-6-astra",
-    "why investigators": "openai/gpt-6-luna",
-    "why synthesizer": "openai/gpt-6-astra",
-    "reflect tooling": "openai/gpt-6-sol",
-    "reflect judgment, divergent, synthesizer": "openai/gpt-6-astra",
-    "arena runners": ["openai/gpt-6-astra", "openai/gpt-6-sol", "openai/gpt-6-luna"],
-    "arena cross-judge pool": ["openai/gpt-6-astra", "openai/gpt-6-sol", "openai/gpt-6-luna"],
-    "swarm workers": "openai/gpt-6-sol",
-    "interrogate reviewers": ["openai/gpt-6-astra", "openai/gpt-6-sol", "openai/gpt-6-luna"]
+    "feature, refactoring": "openai/gpt-6-luna-fast#xhigh",
+    "bug-fix": "openai/gpt-6-luna-fast#xhigh",
+    "perf-issue": "openai/gpt-6-luna-fast#xhigh",
+    "hillclimb": "openai/gpt-6-luna-fast#xhigh",
+    "judgment and prose": "openai/gpt-6.1-sol#max",
+    "hardest tasks": "openai/gpt-6.1-sol#max",
+    "how explorer": "openai/gpt-6-luna-fast#xhigh",
+    "how explainer": "openai/gpt-6.1-sol#max",
+    "why investigators": "openai/gpt-6-luna-fast#xhigh",
+    "why synthesizer": "openai/gpt-6.1-sol#max",
+    "reflect tooling": "openai/gpt-6.1-sol#max",
+    "reflect judgment, divergent, synthesizer": "openai/gpt-6.1-sol#max",
+    "arena runners": ["openai/gpt-6.1-sol#max", "openai/gpt-6-astra#max", "openai/gpt-6-luna-fast#xhigh"],
+    "arena cross-judge pool": ["openai/gpt-6.1-sol#max", "openai/gpt-6-astra#max", "openai/gpt-6-luna-fast#xhigh"],
+    "swarm workers": "openai/gpt-6-luna-fast#xhigh",
+    "interrogate reviewers": ["openai/gpt-6.1-sol#max", "openai/gpt-6-astra#max", "openai/gpt-6-luna-fast#xhigh"]
   }
 }
