@@ -9,5 +9,5 @@
     "skipLibCheck": true,
     "noEmit": true
   },
-  "include": ["plugin/**/*.mjs"]
+  "include": ["plugin/**/*.mjs", "skills/poteto-mode/scripts/orch/**/*.mjs"]
 }

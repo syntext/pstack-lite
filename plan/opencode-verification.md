@@ -64,6 +64,14 @@ These checks preceded native packaging and the budget-model restriction; the ret
 
 ## Coverage limits
 
+### Local execution restoration
+
+Orchestrate and Autonomous run are restored from the preserved upstream workflows with local execution boundaries. The package now includes 18 playbooks; skill and agent counts remain 44 and two. Existing implementation playbooks and model configuration are unchanged by this restoration.
+
+Automated restoration checks cover dependency gating at integrated revisions, blocked/failed/typecheck-only verdicts, invalidated code revisions, stale worker attempts, non-destructive completion draining, archived idempotent acknowledgment, process-to-process resumption, dead-owner lock recovery, live-owner lock refusal, malformed-input preservation, standing orders, and decision gates. A real Git fixture runs isolated code workers, integrates their commits serially, releases a dependent unit only after integrated checks pass, and checks the final behavior while preserving supplied requirements and unrelated local edits. The installed-package test exercises the helper through the full result/verdict/integration/completion lifecycle and verifies native loading of the updated router and supporting assets.
+
+These checks exercise bookkeeping and real local Git execution, not model compliance. No new model-driven coordinator run, cancellation behavior, optional sub-coordinator tree, unattended wakeup, or automatic restart recovery has been demonstrated by this restoration. Runtime limitations are explicit in the playbooks. The earlier live-workflow evidence above remains historical and does not prove the new coordinator behavior.
+
 Interactive setup choices were inspected; repeatability and preservation were tested through its helper rather than a simulated human interview. The requested budget-model run does not re-exercise the bundled Astra/Sol/Luna Arena panel or Interrogate trio; the earlier Interrogate smoke check covers those model IDs without pinned reasoning. The live cases above cover representative workflows, not every retained playbook or app-specific verification surface. They demonstrate observed behavior on these tasks, not guaranteed model compliance on arbitrary prompts.
 
 PR creation and reuse were exercised only against the approved private fixture repository. No merge, automated landing, or publication of this plugin was performed.

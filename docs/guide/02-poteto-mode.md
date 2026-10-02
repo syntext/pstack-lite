@@ -1,6 +1,6 @@
 # Route work through `/poteto-mode`
 
-`/poteto-mode` is the front door. You give it a goal, it matches one of sixteen playbooks, copies that playbook's steps into a checklist, and calls the other skills as the steps need them. In this page you learn what a good prompt looks like, and how little of one you actually need.
+`/poteto-mode` is the front door. You give it a goal, it matches one of eighteen playbooks, copies that playbook's steps into a checklist, and calls the other skills as the steps need them. In this page you learn what a good prompt looks like, and how little of one you actually need.
 
 ![A dispatcher pulls a switch lever to route robots on rail handcars toward lit gates, under a /poteto-mode departure board listing BUG FIX, FEATURE, and INVESTIGATION.](./images/router.jpg)
 
@@ -89,7 +89,20 @@ Name the task and the evidence you need:
 /poteto-mode migrate these callers. verify the migration check reports zero old callers. log your decisions.
 ```
 
-[`/show-me-your-work`](../../skills/show-me-your-work/SKILL.md) keeps a decision log for work you'll review later. The selected implementation playbook owns the task; no separate execution program is generated.
+[`/show-me-your-work`](../../skills/show-me-your-work/SKILL.md) keeps a decision log for work you'll review later. The selected implementation playbook owns a single task. A dependent program uses Orchestrate.
+
+## Coordinate supplied work
+
+```text
+/poteto-mode orchestrate the work in <task-file>. Keep its requirements unchanged.
+Run independent units in parallel where safe, verify integration, and finish locally.
+```
+
+[Orchestrate](../../skills/poteto-mode/playbooks/orchestrate.md) derives execution units, dependencies, exclusive scopes, and verification from your supplied work. It keeps coupled code with one owner under the existing engineering playbook. Parallel writers need separate checkouts; shared Git writes serialize. Small tasks skip coordinator machinery.
+
+The coordinator records execution facts in a task-local store, by default `.opencode/pstack-runs/<run-id>/`. It does not create a competing specification or edit supplied planning files unless you request completion-marker updates. A unit is done only after acceptance checks pass against the integrated result. Blocked checks and late worker results cannot stand in for proof.
+
+For one goal needing sustained iterations, [Autonomous run](../../skills/poteto-mode/playbooks/autonomous-run.md) wraps the matching implementation workflow. Both workflows checkpoint for resumption. Neither promises unattended wakeups, timed audits, or automatic restart recovery without an actual runtime mechanism. They require no PR or push.
 
 **Pitfall:** don't enumerate skills in your prompt ("use /how, then /arena..."). The playbook already sequences them, and a hand-written sequence usually reorders or drops steps the playbook would have kept. Name a skill only when you want to override a specific choice.
 

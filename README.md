@@ -2,7 +2,7 @@
 
 a native OpenCode V2 plugin adapting [pstack](https://github.com/cursor/plugins/tree/main/pstack), created by [Lauren Tan (poteto)](https://x.com/poteto) in the [cursor/plugins repository](https://github.com/cursor/plugins). this repository preserves pstack's relevant git history and [MIT license](./LICENSE).
 
-the scope is implementation, investigation, verification, review, and model selection. the default result is verified local work and a concise report; creating a PR is an optional finish when you request it. supply requirements and file references at runtime; no spec tool or artifact format is required. deep planning, standing orchestration, and PR-monitoring programs are excluded. retained skills keep upstream wording and behavior except for these exclusions, OpenCode compatibility, and model selection.
+the scope is implementation, investigation, verification, review, local execution coordination, and model selection. the default result is verified local work and a concise report; creating a PR is an optional finish when you request it. supply requirements and file references at runtime; no spec tool or artifact format is required. deep planning, PR-monitoring programs, and bundled unattended scheduling are excluded. retained skills keep upstream wording and behavior except for these exclusions, OpenCode compatibility, and model selection.
 
 much of this README retains Lauren's original wording. first-person descriptions of pstack's style and philosophy are hers.
 
@@ -28,7 +28,7 @@ fork it. improve it. make it yours. PRs are welcome!
 - **Benny** (`automations/benny/`): removed the optional Slack triage and reproduction automation pack, including its skills, templates, and setup instructions.
 - **Grok Bot UI** (`skills/make-bot-ui/`): removed the routine/webhook integration and its skill listing. the port's bundled model defaults were chosen separately, as described below.
 - **Cursor-only setup advice**: installation of `cursor-team-kit`, `/loop` recommendations, and migration advice for old Cursor model rules have been removed.
-- **Deep planning and orchestration**: removed `architect`, `figure-it-out`, the multi-phase planning playbook and validator, orchestrate and its bookkeeping scripts, both autopilot playbooks, and the autonomous-run playbook. removed their routes and overnight guide; implementation comparison through `arena` remains optional.
+- **Deep planning and PR autopilot**: removed `architect`, `figure-it-out`, the multi-phase planning playbook and validator, both autopilot playbooks, and the overnight guide. implementation comparison through `arena` remains optional. Orchestrate and Autonomous run have been restored for supplied work and local execution, without their cloud/PR machinery.
 - **PR monitoring and automated landing**: removed Babysit, Shipping, Bugbot triage, and `skills/poteto-mode/scripts/watch-pr/`, including its tests, bootstrap, and dedicated Bun dependency bundle.
 
 the original files remain available in the preserved upstream history and baseline commit `8503161`.
@@ -42,6 +42,7 @@ the original files remain available in the preserved upstream history and baseli
 - activation metadata now uses OpenCode's explicit-only discovery control. sticky mode is a conversation instruction, not an editor hook.
 - Comment Sicko reports proposed changes; the parent applies accepted findings. its review criteria remain the same.
 - ordinary workflows finish locally. PR creation runs only on request, then returns the URL. worktree auditing uses local Git refs; hosted PR history is optional investigation context.
+- Orchestrate decomposes supplied work into dependent execution units and coordinates local implementation, verification, and integration. its Node bookkeeping uses unit/revision/attempt records and replay-safe completion acknowledgment, not a PR frontier. Autonomous run continues one goal through the matching engineering playbook. neither bundles a scheduler or creates a competing specification.
 
 ### added for this port
 
@@ -116,7 +117,7 @@ use [`/poteto-mode`](./skills/poteto-mode/SKILL.md) at the start of a task. it r
 
 ### just use [`/poteto-mode`](./skills/poteto-mode/SKILL.md)
 
-this skill is the main shortcut. i use it whenever i need the agent to do rigorous engineering work. this port retains sixteen playbooks:
+this skill is the main shortcut. i use it whenever i need the agent to do rigorous engineering work. this port includes eighteen playbooks:
 
 ```
 /poteto-mode this view has a subtle bug where the scroll drifts every 750ms even when idle. repro
@@ -124,7 +125,7 @@ first, then fix and verify.
 ```
 
 <details>
-<summary>the sixteen playbooks</summary>
+<summary>the eighteen playbooks</summary>
 
 | playbook | for |
 |---|---|
@@ -135,6 +136,8 @@ first, then fix and verify.
 | [runtime forensics](./skills/poteto-mode/playbooks/runtime-forensics.md) | diagnose a live symptom (leak, idle-cpu spin, glitch) from instrumentation. |
 | [trace forensics](./skills/poteto-mode/playbooks/trace-forensics.md) | diagnose a captured profiling artifact (cpuprofile, trace, spindump, heap snapshot). |
 | [feature](./skills/poteto-mode/playbooks/feature.md) | new or changed behavior, built from a named data shape. |
+| [orchestrate](./skills/poteto-mode/playbooks/orchestrate.md) | coordinate supplied work across dependent owners, with durable state and verified local integration. |
+| [autonomous run](./skills/poteto-mode/playbooks/autonomous-run.md) | keep driving one checkable goal through its matching engineering playbook, with checkpoints. |
 | [refactoring](./skills/poteto-mode/playbooks/refactoring.md) | a behavior-preserving change to structure or shape. |
 | [prototype](./skills/poteto-mode/playbooks/prototype.md) | a throwaway sketch to make a design or behavioral decision cheaply, or to settle an empirical fork by observing it. |
 | [visual parity](./skills/poteto-mode/playbooks/visual-parity.md) | pixel-exact ui equivalence between two implementations. |
@@ -289,7 +292,7 @@ see [verification results](./plan/opencode-verification.md) for automated checks
 
 ## why are there no planning skills?
 
-the best spec is code. this port accepts the brief you supply and focuses on implementation and review; deep planning workflows were removed.
+the best spec is code. this port accepts the brief you supply and focuses on implementation and review; deep planning workflows were removed. Orchestrate owns execution decomposition and coordination, not specification authoring. supplied planning files are read-only by default; runtime records track work and evidence rather than creating a second plan.
 
 ## make it yours
 

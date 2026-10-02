@@ -118,7 +118,7 @@ Comments follow the same rule as the reply. Write them clean as you go. Keep a c
 
 Open a todolist whose first items are the matched playbook's steps, copied in verbatim, before any task-specific todos. A step you choose not to do stays in the list with a one-line `skip: <reason>`. Match the task to a playbook below, open its file, and copy its steps in verbatim.
 
-Use the supplied requirements, constraints, file references, and acceptance criteria. For larger work, apply the matching playbook to the selected task. If none fits, work directly from that brief and the relevant principles. Surface missing requirements rather than generating a separate specification or execution program.
+Use the supplied requirements, constraints, file references, and acceptance criteria. Surface missing requirements rather than generating a separate specification. For a program of dependent owners, use Orchestrate to derive execution units and coordinate them against the supplied work. Keep coupled code with one owner under the matching engineering playbook. Autonomous run controls continuation for one goal; its engineering playbook still owns implementation and review. Small multi-step changes need neither program machinery nor a new plan. If none fits, work directly from the brief and relevant principles.
 
 - **Investigation.** Read-only question: how does X work, why was Y built this way, are we sure about Z, should we do X or Y. `playbooks/investigation.md`.
 - **Bug fix.** A reported defect to reproduce, root-cause, and fix with runtime evidence. `playbooks/bug-fix.md`.
@@ -127,6 +127,8 @@ Use the supplied requirements, constraints, file references, and acceptance crit
 - **Runtime forensics.** Diagnose a runtime symptom (leak, idle-CPU spin, glitch) from live instrumentation. The deliverable is a diagnosis, not a fix. `playbooks/runtime-forensics.md`.
 - **Trace forensics.** Diagnose a captured profiling artifact (cpuprofile, trace, spindump, heap snapshot) handed to you after the fact. The deliverable is a diagnosis, not a fix. `playbooks/trace-forensics.md`.
 - **Feature.** New or changed behavior, built from a named data shape. `playbooks/feature.md`.
+- **Orchestrate.** Execute supplied work across dependent implementation units, coordinate owners, and verify local integration. Not a specification authoring workflow. `playbooks/orchestrate.md`.
+- **Autonomous run.** Drive one checkable goal through sustained iterations using its matching engineering playbook, on an explicit continuation request. `playbooks/autonomous-run.md`.
 - **Refactoring.** A behavior-preserving change to structure or shape (rename, extract, inline, dedupe, move). `playbooks/refactoring.md`.
 - **Prototype.** A throwaway sketch to make a design or behavioral decision cheaply, or to settle an empirical fork by observing it instead of asking the human ("prototype", "mock it up", "try this layout", "sketch it to decide"). `playbooks/prototype.md`.
 - **Visual parity.** Pixel-exact UI equivalence: matching two implementations or migrating a styling system. `playbooks/visual-parity.md`.

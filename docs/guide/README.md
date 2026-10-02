@@ -5,7 +5,7 @@ pstack works best when you stop micromanaging the agent. You describe what you w
 Here's what you'll learn:
 
 1. [Set up pstack](./01-setup.md). Install the plugin and pick your models.
-2. [Route work through `/poteto-mode`](./02-poteto-mode.md). Give it a goal and watch it pick a playbook.
+2. [Route work through `/poteto-mode`](./02-poteto-mode.md). Give it a goal, coordinate supplied work, or continue until verified done.
 3. [Understand the code](./03-understand.md). `/how`, `/why`, `/teach`, and `/recall` before you edit anything.
 4. [Compare and review](./04-design.md). Optional `/arena`, bounded `/swarm`, and `/interrogate` against the supplied brief.
 5. [Build and clean the change](./05-build-and-clean.md). The build playbooks, `/tdd`, `/unslop`, and `/no-comments`.

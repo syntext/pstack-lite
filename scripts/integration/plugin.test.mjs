@@ -74,7 +74,10 @@ test('packed native plugin loads globally and per project without discovery link
     assert.ok(files.has(path), `Missing package file: ${path}`);
   }
   assert.ok([...files].every(path => !path.includes('node_modules/') && !path.startsWith('.opencode/')));
-  assert.equal([...files].filter(path => /^skills\/poteto-mode\/playbooks\/[^/]+\.md$/.test(path)).length, 16);
+  assert.equal([...files].filter(path => /^skills\/poteto-mode\/playbooks\/[^/]+\.md$/.test(path)).length, 18);
+  for (const path of ['playbooks/orchestrate.md', 'playbooks/autonomous-run.md', 'scripts/orch/orch.mjs', 'scripts/orch/store.mjs']) {
+    assert.ok(files.has(`skills/poteto-mode/${path}`), `Missing execution asset: ${path}`);
+  }
   for (const path of ['playbooks/babysit.md', 'playbooks/shipping.md', 'references/bugbot-triage.md', 'scripts/bootstrap.ts', 'scripts/package.json', 'scripts/bun.lock']) {
     assert.ok(!files.has(`skills/poteto-mode/${path}`), `Retired asset in package: ${path}`);
   }
@@ -82,6 +85,21 @@ test('packed native plugin loads globally and per project without discovery link
   const installed = join(root, 'installed');
   await exec('npm', ['install', '--prefix', installed, '--ignore-scripts', '--no-audit', '--no-fund', join(root, packed.filename)], { timeout: 90_000, maxBuffer: 1024 * 1024 });
   const packageRoot = join(installed, 'node_modules/pstack-lite');
+  const runStore = join(root, 'execution-run');
+  const orch = join(packageRoot, 'skills/poteto-mode/scripts/orch/orch.mjs');
+  await exec(process.execPath, [orch, '--store', runStore, 'init'], { cwd: installed });
+  const stored = JSON.parse((await exec(process.execPath, [orch, '--store', runStore, 'status'], { cwd: installed })).stdout);
+  assert.deepEqual(stored.units, []);
+  const operation = async (action, input) => JSON.parse((await exec(process.execPath, [orch, '--store', runStore, ...action.split(' '), '--input', JSON.stringify(input)], { cwd: installed })).stdout);
+  await operation('unit add', { id: 'local', track: 'build', source: 'supplied acceptance criterion', brief: 'local-brief.md' });
+  await operation('unit start', { id: 'local', worker: 'fixture-leaf' });
+  await operation('unit result', { id: 'local', attempt: 1, sha: 'fixture-worker-revision' });
+  const receipt = { id: 'local', attempt: 1, verdict: 'unit-test-verified', evidence: 'fixture-receipt', verifier: 'fixture-reviewer' };
+  await operation('ledger record', { ...receipt, sha: 'fixture-worker-revision' });
+  await operation('unit integrate', { id: 'local', attempt: 1, sha: 'fixture-integrated-revision' });
+  await operation('ledger record', { ...receipt, sha: 'fixture-integrated-revision' });
+  await operation('unit done', { id: 'local', attempt: 1 });
+  assert.deepEqual((await operation('status', {})).counts, { done: 1 });
   assert.notEqual(packageRoot, source);
   assert.equal(fileURLToPath(Host.resolve({ directory: installed, name: 'pstack-lite' }).server), join(packageRoot, 'index.js'));
   const expected = await loadBundle();
