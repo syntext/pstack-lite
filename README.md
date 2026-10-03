@@ -2,6 +2,8 @@
 
 a native OpenCode V2 plugin adapting [pstack](https://github.com/cursor/plugins/tree/main/pstack), created by [Lauren Tan (poteto)](https://x.com/poteto) in the [cursor/plugins repository](https://github.com/cursor/plugins). this repository preserves pstack's relevant git history and [MIT license](./LICENSE).
 
+it also includes selected skills from [Matt Pocock's skills](https://github.com/mattpocock/skills), currently [`codebase-design`](./skills/codebase-design/SKILL.md), under his [MIT license](./skills/codebase-design/LICENSE).
+
 the scope is implementation, investigation, verification, review, local execution coordination, and model selection. the default result is verified local work and a concise report; creating a PR is an optional finish when you request it. supply requirements and file references at runtime; no spec tool or artifact format is required. deep planning, PR-monitoring programs, and bundled unattended scheduling are excluded. retained skills keep upstream wording and behavior except for these exclusions, OpenCode compatibility, and model selection.
 
 much of this README retains Lauren's original wording. first-person descriptions of pstack's style and philosophy are hers.
@@ -50,6 +52,7 @@ the original files remain available in the preserved upstream history and baseli
 - explicit upstream attribution, scope, and implementation status in this README.
 - a [configuration design note](./plan/opencode-configuration-plan.md) with OpenCode V2 behavior, the role inventory, and resolved implementation decisions.
 - a native `pstack` plugin that registers the bundled skills and agents directly, shared role defaults/resolver, and configuration/package-loading tests.
+- [`codebase-design`](./skills/codebase-design/SKILL.md) from [Matt Pocock's skills](https://github.com/mattpocock/skills/tree/main/skills/engineering/codebase-design): deep-module design vocabulary. its wording is kept except for explicit-only activation, OpenCode `subagent` dispatch with the parent model in design-it-twice, and an optional domain glossary. the Codex-only `agents/openai.yaml` metadata is omitted.
 
 ## install
 
@@ -73,7 +76,7 @@ for project installation, add the GitHub repository to the `plugins` array in `<
 
 use the existing `.json` or `.jsonc` file if you already have one. OpenCode downloads the plugin and installs its dependencies from GitHub. Reload OpenCode after enabling it. See [OpenCode plugin installation](https://opencode.ai/v2/docs/plugins).
 
-the plugin registers all 44 skills and both agents in memory using OpenCode's native plugin API. It creates no skill or agent links and writes no discovery files. Supporting files remain inside the plugin package. Its plugin ID is `pstack`; append `"-pstack"` after its entry to disable it.
+the plugin registers the bundled skills and agents in memory using OpenCode's native plugin API. It creates no skill or agent links and writes no discovery files. Supporting files remain inside the plugin package. Its plugin ID is `pstack`; append `"-pstack"` after its entry to disable it.
 
 with a global plugin installation, `/setup-pstack` creates only `.opencode/pstack-models.json` when you choose project preferences. a project using personal or bundled defaults needs no pstack files. setup changes model preferences; enabling the plugin is a separate, explicit action.
 
@@ -193,6 +196,7 @@ the full rules and playbooks live in [`skills/poteto-mode/SKILL.md`](./skills/po
 | [`/teach`](./skills/teach/SKILL.md) | you want to actually understand a change or subsystem, not just have it summarized. runs how + why and weaves one plain explanation, built up diagram by diagram. |
 | [`/tdd`](./skills/tdd/SKILL.md) | you're fixing a bug and there's a cheap local test path. write the failing test first, then the fix. |
 | [`/no-comments`](./skills/no-comments/SKILL.md) | strip comments before review; spawns Comment Sicko, fixes accepted findings, offers encodings for claimed constraints. |
+| [`/codebase-design`](./skills/codebase-design/SKILL.md) | you're designing or reshaping a module's interface, deciding where a seam goes, or making code more testable. shared deep-module vocabulary, from [Matt Pocock](https://github.com/mattpocock/skills). |
 | [`/typescript-best-practices`](./skills/typescript-best-practices/SKILL.md) | you're reading or editing typescript. grounds the type-system-discipline principle in syntax. |
 | [`/show-me-your-work`](./skills/show-me-your-work/SKILL.md) | you want a reviewable decision trail. logs decisions to a tsv you can commit. |
 | [`/create-verification-skill`](./skills/create-verification-skill/SKILL.md) | your project has no scripted way to prove app behavior. generates a project-local verify skill with a feature map, for any language or platform. |
@@ -251,10 +255,10 @@ pstack also ships [Comment Sicko](./agents/comment-sicko.md), a read-only commen
 
 ## principles
 
-twenty-three short skills, one principle each. `poteto-mode` indexes them inline and reads that index at task start. the standalone files are there so other skills can reference a principle by name, and so the index can point at the full rule for each.
+short skills, one principle each. `poteto-mode` indexes them inline and reads that index at task start. the standalone files are there so other skills can reference a principle by name, and so the index can point at the full rule for each.
 
 <details>
-<summary>all twenty-three principles</summary>
+<summary>all principles</summary>
 
 | principle | group | rule |
 |---|---|---|
@@ -305,3 +309,5 @@ models are configurable too. [`/setup-pstack`](./skills/setup-pstack/SKILL.md) m
 ## license
 
 [MIT](./LICENSE). original work copyright Lauren Tan. upstream: [cursor/plugins — pstack](https://github.com/cursor/plugins/tree/main/pstack).
+
+[`codebase-design`](./skills/codebase-design/) is [MIT](./skills/codebase-design/LICENSE), copyright Matt Pocock. upstream: [mattpocock/skills — codebase-design](https://github.com/mattpocock/skills/tree/main/skills/engineering/codebase-design).

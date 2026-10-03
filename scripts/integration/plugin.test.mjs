@@ -93,7 +93,7 @@ test('packed native plugin loads globally and per project without discovery link
   const baseURL = `http://127.0.0.1:${provider.address().port}/v1`;
   const packed = JSON.parse((await exec('npm', ['pack', '--json', '--pack-destination', root], { cwd: source })).stdout)[0];
   const files = new Set(packed.files.map(file => file.path));
-  for (const path of ['index.js', 'plugin/index.mjs', 'agents/comment-sicko.md', 'skills/setup-pstack/scripts/models.mjs', 'skills/poteto-mode/scripts/worktree-audit.sh', 'skills/show-me-your-work/scripts/log.sh', 'skills/poteto-mode/playbooks/opening-a-pr.md', 'LICENSE']) {
+  for (const path of ['index.js', 'plugin/index.mjs', 'agents/comment-sicko.md', 'skills/setup-pstack/scripts/models.mjs', 'skills/poteto-mode/scripts/worktree-audit.sh', 'skills/show-me-your-work/scripts/log.sh', 'skills/poteto-mode/playbooks/opening-a-pr.md', 'skills/codebase-design/LICENSE', 'LICENSE']) {
     assert.ok(files.has(path), `Missing package file: ${path}`);
   }
   assert.ok([...files].every(path => !path.includes('node_modules/') && !path.startsWith('.opencode/')));
@@ -126,9 +126,9 @@ test('packed native plugin loads globally and per project without discovery link
   assert.notEqual(packageRoot, source);
   assert.equal(fileURLToPath(Host.resolve({ directory: installed, name: 'pstack-lite' }).server), join(packageRoot, 'index.js'));
   const expected = await loadBundle();
-  assert.equal(expected.skills.length, 44);
+  assert.equal(expected.skills.length, 45);
   assert.equal(expected.agents.length, 2);
-  assert.equal(expected.skills.filter(skill => skill.autoinvoke === false).length, 43);
+  assert.equal(expected.skills.filter(skill => skill.autoinvoke === false).length, 44);
 
   for (const scope of ['global', 'project']) {
     await t.test(`${scope} plugin registration, overrides, reload, and removal`, async t => {
